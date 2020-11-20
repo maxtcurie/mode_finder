@@ -1,3 +1,4 @@
+#Owner: Joel Larakers, Max T. Curie
 #Created by Max T. Curie  11/02/2020
 #Last edited by Max T. Curie 11/04/2020
 #Supported by scripts in IFS: 
