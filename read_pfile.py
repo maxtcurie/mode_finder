@@ -50,14 +50,14 @@ def read_pfile(p_file_name,Z,add_impurity=False):
         print('Error, missing needed quantities in q file, check line 31 need_list in read_qfile.py')
         if need_list_number[4]==-1:
             need_list_number[4]=0
-            temp0=input("The array er is missing, force the array to zero, countiune: 1:Yes, 2.No")
+            temp0=input("The array er is missing, force the array to zero, countiune: 1:Yes, 2.No         ")
             if temp0==2:
                 sys.exit()
             elif temp0==1:
                 case=1    #er missing 
                 
         elif need_list_number[5]==-1:
-            temp0=input("The array vtor is missing, force the array to zero, countiune: 1:Yes, 2.No")
+            temp0=input("The array vtor is missing, force the array to zero, countiune: 1:Yes, 2.No        ")
             need_list_number[5]=0
             if temp0==2:
                 sys.exit()
@@ -310,4 +310,4 @@ def p_to_iterdb_format(p_file_name,geomfile_name):
     psi_u = interp(rhot0,psi0,uni_rhot)
     rhop_u = np.sqrt(np.array(psi_u))
 
-    return uni_rhot, rhop_u, te_u, ti_u, ne_u*10., ni_u*10., omega_tor
+    return uni_rhot, rhop_u, 1000.0*te_u, 1000.0*ti_u, 1.0e19*ne_u*10., 1.0e19*ni_u*10., omega_tor

@@ -57,6 +57,7 @@ def read_geom_file(file_type,file_name,suffix="dat"):
         # even grid of psi_pol, on which all 1D fields are defined
         xgrid = EFITdict['psipn']
         q = EFITdict['qpsi']
+        return xgrid, q
         
     elif file_type=="GENE_tracor":
         gpars,geometry = read_geometry_global(file_name)
@@ -68,10 +69,12 @@ def read_geom_file(file_type,file_name,suffix="dat"):
             suffix="_"+suffix
 
         pars = init_read_parameters_file(suffix)
-
+        Lref=pars['Lref']
+        Bref=pars['Bref']
+        x0_from_para=pars['x0']
         if 'lx_a' in pars:
             xgrid = np.arange(pars['nx0'])/float(pars['nx0']-1)*pars['lx_a']+pars['x0']-pars['lx_a']/2.0
         else:
             xgrid = np.arange(pars['nx0'])/float(pars['nx0']-1)*pars['lx'] - pars['lx']/2.0
-
-    return xgrid, q
+        return xgrid, q, Lref, Bref, x0_from_para
+    

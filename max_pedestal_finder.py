@@ -44,7 +44,19 @@ def find_pedestal_from_data(uni_rhot,p,dp,plot=False):
     ddp   = np.gradient(dp,uni_rhot)  #Second order of pressure
     midped = uni_rhot[np.argmin(dp)]
     topped = uni_rhot[np.argmin(ddp)]
-
+    if plot == 1:
+        plt.clf()
+        plt.title(r'$Compare$')
+        plt.xlabel(r'$r/a$',fontsize=10)
+        plt.ylabel(r'$ab$',fontsize=13)
+        #plt.plot(uni_rhot,p,label="p")
+        plt.plot(uni_rhot,dp,label="dp")
+        plt.plot(uni_rhot,ddp,label="ddp")
+        plt.axvline(x=midped, label="Mid-pedestal", color="red")
+        plt.axvline(x=topped, label="Top-pedestal", color="green")
+        plt.legend()
+        #plt.savefig('compare.png')
+        plt.show()
     print(topped)
     print(midped)
     return midped, topped
