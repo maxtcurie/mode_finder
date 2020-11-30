@@ -18,26 +18,28 @@ from read_EFIT_file import get_geom_pars
 #**************Block for user*****************************************
 #**************Setting up*********************************************
 profile_type="ITERDB"           # "ITERDB" "pfile" 
-geomfile_type="gfile"          # "gfile"  "GENE_tracor"
+geomfile_type="GENE_tracor"          # "gfile"  "GENE_tracor"
 
-profile_name = 'DIIID174819.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+profile_name = path+'DIIID162940.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = 'g174819.03090_646'             #name of the magnetic geometry file
+geomfile_name = 'tracer_efit.dat'
+#geomfile_name = 'g162940.02944_670'             #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
-suffix='0001'                   #The suffix if one choose to use GENE_tracor for q profile
+suffix='dat'                   #The suffix if one choose to use GENE_tracor for q profile
                                 #0001, 1, dat
 
 f_max=200      #upper bound of the frequency experimentally observed 
 f_min=0        #lower bound of the frequency experimentally observed 
 plot = 1         #set to 1 if you want to plot the result
 report=1         #set to 1 if you want to export a csv report
-omega_percent=15.  #choose the omega within the top that percent defined in(0,100)
+omega_percent=20.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
-n0_max=20      #maximum mode number (include) that finder will cover
-q_scale= 1.       #set the q to q*q_scale
+n0_max=7      #maximum mode number (include) that finder will cover
+q_scale= 1.013833589893983        #set the q to q*q_scale
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 
 x0_center_choose=0  #change to 1 if one wants to choose mid-pedestal manually 
@@ -243,7 +245,7 @@ for n0 in range(n0_min,n0_max+1):
                     f_range.append(omega[ix])
                     f_GENE_range.append(omega[ix]*2*np.pi*1000/gyroFreq[ix])
                     x_range.append(uni_rhot[ix])
-                    drive_range.append(mtmFreq[ix]/omega_max)
+                    drive_range.append(mtmFreq[ix]/(float(n)*omega_max))
 
                 else:
                     if plot==1:
