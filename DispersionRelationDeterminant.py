@@ -123,7 +123,7 @@ def Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar):
   print("****************")
   print("nu,eta,shat,beta,ky,ModIndex,mu,xstar")
   print(nu,eta,shat,beta,ky,ModIndex,mu,xstar)
-  print("gamma+j*omeag")
+  print("omeag+j*gamma")
   print(w0)
   print("****************")
   print("****************")

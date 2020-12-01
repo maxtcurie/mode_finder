@@ -51,10 +51,10 @@ profile_type="ITERDB"           # "ITERDB" "pfile"
 geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-profile_name = 'DIIID162940.iterdb' 		#name of the profile file
+profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = 'g162940.02944_670'
+geomfile_name = 'jet78697.51005_hager.eqdsk'
 # geomfile_name = 'tracer_efit.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
@@ -66,11 +66,11 @@ run_mode_finder=True        #Change to True if one want to run mode finder
 run_nu_scan=False           #Change to True if one want to run collisionality scan 
 ModIndex=1 
 
-omega_percent=20.                       #choose the omega within the top that percent defined in(0,100)
+omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
-q_scale=1.
+q_scale=1.05
 n_min=1                                #minmum mode number (include) that finder will cover
-n_max=7                               #maximum mode number (include) that finder will cover
+n_max=12                               #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
 plot_profile=False                     #Set to True is user want to have the plot of the profile
 plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
@@ -386,8 +386,8 @@ def Dispersion_list(uni_rhot,nu,eta,shat,beta,ky,ModIndex,mu,xstar,plot):
     
     gamma_complex=np.asarray(gamma_complex)
     #factor=np.asarray(factor)
-    gamma=gamma_complex.real
-    omega=gamma_complex.imag
+    gamma=gamma_complex.imag
+    omega=gamma_complex.real
 
     if plot==True:
         plt.clf()
@@ -541,8 +541,8 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             #gamma,factor=Dispersion(nu_top[x_index]/float(n0),eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar,)
             
             gamma_complex=gamma
-            gamma=gamma_complex.real
-            omega=gamma_complex.imag
+            gamma=gamma_complex.imag
+            omega=gamma_complex.real
 
             
             kHz_to_cs_a=omega_n_GENE_top[x_index]/omega_n_top[x_index]   # kHz * (kHz_to_cs_a)= cs/a unit
