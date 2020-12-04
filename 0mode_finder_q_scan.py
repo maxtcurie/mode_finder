@@ -160,7 +160,7 @@ for q_scale in q_scale_list:        #set the q to q*q_scale
     gyroFreq = 9.79E3/np.sqrt(mref)*np.sqrt(te_u)/Lref
     #print("gyroFreq="+str(gyroFreq[center_index]))
     mtmFreq0 = omMTM*gyroFreq/2./np.pi/1000.
-    omegaDoppler0 = vrot_u*n0_global/2./np.pi/1E3
+    omegaDoppler0 = abs(vrot_u*n0_global/2./np.pi/1E3)
     omega0 = mtmFreq0 + omegaDoppler0
     #***End of Calculate omeage star**************************
 

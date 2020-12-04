@@ -18,13 +18,13 @@ from read_EFIT_file import get_geom_pars
 #**************Block for user*****************************************
 #**************Setting up*********************************************
 profile_type="ITERDB"           # "ITERDB" "pfile" 
-geomfile_type="GENE_tracor"          # "gfile"  "GENE_tracor"
+geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-profile_name = path+'DIIID162940.iterdb' 		#name of the profile file
+profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = 'tracer_efit.dat'
+geomfile_name = 'jet78697.51005_hager.eqdsk'
 #geomfile_name = 'g162940.02944_670'             #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
@@ -38,8 +38,8 @@ plot = 1         #set to 1 if you want to plot the result
 report=1         #set to 1 if you want to export a csv report
 omega_percent=20.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
-n0_max=7      #maximum mode number (include) that finder will cover
-q_scale= 1.013833589893983        #set the q to q*q_scale
+n0_max=12      #maximum mode number (include) that finder will cover
+q_scale= 1.       #set the q to q*q_scale
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 
 x0_center_choose=0  #change to 1 if one wants to choose mid-pedestal manually 
@@ -146,7 +146,7 @@ omMTM = kyGENE*(tprime_e+nprime_e)
 gyroFreq = 9.79E3/np.sqrt(mref)*np.sqrt(te_u)/Lref
 #print("gyroFreq="+str(gyroFreq[center_index]))
 mtmFreq0 = omMTM*gyroFreq/2./np.pi/1000.
-omegaDoppler0 = vrot_u*n0_global/2./np.pi/1E3
+omegaDoppler0 = abs(vrot_u*n0_global/2./np.pi/1E3)
 omega0 = mtmFreq0 + omegaDoppler0
 #***End of Calculate omeage star**************************
 
@@ -183,6 +183,7 @@ ky_range=[]
 n0_range=[]
 m0_range=[]
 f_range=[]
+MTM_range=[]
 f_GENE_range=[]
 x_range=[]
 drive_range=[]
@@ -243,6 +244,7 @@ for n0 in range(n0_min,n0_max+1):
                     n0_range.append(n)
                     m0_range.append(m)
                     f_range.append(omega[ix])
+                    MTM_range.append(mtmFreq[ix])
                     f_GENE_range.append(omega[ix]*2*np.pi*1000/gyroFreq[ix])
                     x_range.append(uni_rhot[ix])
                     drive_range.append(mtmFreq[ix]/(float(n)*omega_max))
@@ -279,9 +281,9 @@ print('***************End of report******************')
 if report==1:
     with open('mode_number_finder_report.csv','w') as csvfile:
         data = csv.writer(csvfile, delimiter=',')
-        data.writerow(['n ','m ','ky(' + str(x0_center)+')','ky(r)   ','frequency(kHz)           ','location(r/a)            ','omega(cs/a)    ','Drive(omega*/omega*_max)'])
+        data.writerow(['n ','m ','ky(' + str(x0_center)+')','ky(r)   ','frequency(kHz)           ','frequency_plasma_frame(kHz)           ','location(r/a)            ','omega(cs/a)    ','Drive(omega*/omega*_max)'])
         for i in range(len(n0_range)):
-            data.writerow([n0_range[i],m0_range[i],kymin_range[i],ky_range[i],f_range[i],x_range[i],f_GENE_range[i],drive_range[i]])
+            data.writerow([n0_range[i],m0_range[i],kymin_range[i],ky_range[i],f_range[i],MTM_range[i],x_range[i],f_GENE_range[i],drive_range[i]])
     csvfile.close()
 
 ky_range2=ky_range

@@ -11,25 +11,17 @@ import matplotlib.pyplot as plt
 from interp import *
 import math
 import csv
-
-
 from scipy import optimize
-# import warnings
-# from scipy.optimize import OptimizeWarning
 
-#from read_EFIT import *
-#from read_EFIT_file import *
-#from read_iterdb_file import *
+
 from max_pedestal_finder import find_pedestal
-
 from max_pedestal_finder import find_pedestal_from_data
-
 from read_profiles import read_profile_file
 from read_profiles import read_geom_file
 from read_EFIT_file import get_geom_pars
-
 from max_stat_tool import *
-from DispersionRelationDeterminant import Dispersion
+#from DispersionRelationDeterminant import Dispersion
+from DispersionRelationDeterminantFullConductivity import Dispersion
 
 #The following function computes the growth rate of the slab MTM. The input are the physical parameters and it outputs the growth rate in units of omega_{*n}
 #Parameters for function:
@@ -50,8 +42,8 @@ from DispersionRelationDeterminant import Dispersion
 profile_type="ITERDB"           # "ITERDB" "pfile" 
 geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 geomfile_name = 'jet78697.51005_hager.eqdsk'
@@ -68,7 +60,7 @@ ModIndex=1
 
 omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
-q_scale=1.05
+q_scale=0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
 n_max=12                               #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
@@ -98,8 +90,8 @@ nu_percent=10  #about the nu0 for x% 1=100%
 def gaussian(x, amplitude, mean, stddev):
     return amplitude * np.exp(-((x - mean) / stddev)**2)
 
-def omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,show=False):
-    x,data=np.array(uni_rhot), np.array(mtmFreq)
+def gaussian_fit(x,data):
+    x,data=np.array(x), np.array(data)
 
     #warnings.simplefilter("error", OptimizeWarning)
     judge=0
@@ -127,8 +119,8 @@ def omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,show=False):
         
         popt=[0]*3  
         max_index=np.argmax(data)
-        popt[0]=data[max_index]	#amplitud
-        popt[1]=x[max_index]	#mean
+        popt[0]=data[max_index] #amplitud
+        popt[1]=x[max_index]    #mean
 
         plt.clf()
         plt.plot(x,data, label="data")
@@ -138,7 +130,7 @@ def omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,show=False):
 
         while judge==0:
 
-            popt[2]=float(input("sigma="))*np.sqrt(2.)	#stddev
+            popt[2]=float(input("sigma="))*np.sqrt(2.)  #stddev
 
             plt.clf()
             plt.plot(x,data, label="data")
@@ -159,7 +151,7 @@ def omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,show=False):
         popt[0]=data[max_index] #amplitud
         popt[1]=x[max_index]    #mean
 
-        popt[2]=float(input("sigma="))*np.sqrt(2.)	#stddev
+        popt[2]=float(input("sigma="))*np.sqrt(2.)  #stddev
 
         plt.clf()
         plt.plot(x,data, label="data")
@@ -176,15 +168,23 @@ def omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,show=False):
     amplitude=popt[0]
     mean     =popt[1]
     stddev   =popt[2] 
-    
+
+    return amplitude,mean,stddev
+
+
+def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
+    amplitude,mean,stddev=gaussian_fit(x,data)
 
     mean_rho=mean*Lref/rhoref         #normalized to rhoi
     xstar=abs(stddev*Lref/rhoref)
+    
+    popt=[0]*3
+    popt[0] = amplitude
+    popt[1] = mean     
+    popt[2] = stddev   
 
     print(popt)
     print(mean_rho,xstar)
-
-    
 
     if show==True:
         plt.clf()
@@ -299,7 +299,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     omMTM = kyGENE*(tprime_e+nprime_e)
     gyroFreq = 9.79E3/np.sqrt(mref)*np.sqrt(te_u)/Lref
     mtmFreq = omMTM*gyroFreq/(2.*np.pi*1000.)
-    omegaDoppler = vrot_u*n0/(2.*np.pi*1000.)
+    omegaDoppler = abs(vrot_u*n0/(2.*np.pi*1000.))
     omega=mtmFreq + omegaDoppler
 
     omega_n_GENE=kyGENE*(nprime_e)       #in cs/a
@@ -310,7 +310,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     shat=Ln/Lq
     eta=Ln/Lt
     ky=kyGENE
-    nu=(coll_ei)/(2.*np.pi*omega_n) 
+    nu=(coll_ei)/(omega_n) 
 
 
     mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,plot)
