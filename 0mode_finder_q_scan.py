@@ -18,27 +18,27 @@ from read_EFIT_file import get_geom_pars
 #**************Block for user*****************************************
 #**************Setting up*********************************************
 profile_type="ITERDB"           # "ITERDB" "pfile" 
-geomfile_type="gfile"          # "gfile"  "GENE_tracor"
+geomfile_type="GENE_tracor"          # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+profile_name = path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = 'jet78697.51005_hager.eqdsk'
+geomfile_name = 'gene.dat'
 #geomfile_name = 'g162940.02944_670'             #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
 suffix='dat'                   #The suffix if one choose to use GENE_tracor for q profile
                                 #0001, 1, dat
-q_scale_list=np.arange(0.9,1.1,0.005)
+q_scale_list=np.arange(0.94,0.96,0.0005)
 
-f_max=200      #upper bound of the frequency experimentally observed 
+f_max=500      #upper bound of the frequency experimentally observed 
 f_min=0        #lower bound of the frequency experimentally observed 
 report=1         #set to 1 if you want to export a csv report
 omega_percent=20.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
-n0_max=10      #maximum mode number (include) that finder will cover
+n0_max=13      #maximum mode number (include) that finder will cover
 
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 

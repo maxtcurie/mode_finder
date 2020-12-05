@@ -125,7 +125,7 @@ def A_maker(x_max, del_x, w1, v1,eta,alpha,beta,ky,ModIndex,mu,xstar):
     else:
         print("ModIndex must be 0 or 1")
         ModG=0
-    sigma_grid = (w1*L11_grid-(1.0+eta)*np.multiply(L11_grid,ModG) - eta*np.multiply(L12grid,ModG))/v1
+    sigma_grid = ((w1-(1.0+eta))*np.multiply(L11_grid,ModG) - eta*np.multiply(L12grid,ModG))/v1
     #print(sigma_grid)
     #print(ModG)
     # computing the diagonal components of the matrix
@@ -151,6 +151,7 @@ def A_maker(x_max, del_x, w1, v1,eta,alpha,beta,ky,ModIndex,mu,xstar):
     A[num-3,num-3] = A[num-3,num-3] - 1/del_x**2*(1-ky*del_x)
     A[num-2,num-2] = A[num-2,num-2] - 1/del_x**2*(1-ky*del_x)
     A[2*num-5,2*num-5] =  A[2*num-5,2*num-5] - 1/del_x**2*(1-ky*del_x)
+    
     return A
 
 def w_finder(x_max, del_x, w_guess, v,ne,alpha,beta,ky,ModIndex,mu,xstar):
@@ -174,12 +175,10 @@ def w_finder(x_max, del_x, w_guess, v,ne,alpha,beta,ky,ModIndex,mu,xstar):
         w_minus = w0
         w0 = w_plus
         det_A_minus = det_A0
-        #print(w0)
     return w0
 
 def Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar):
   #Fit Parameters
-  ky=ky*np.sqrt(2.)
   mu=abs(mu)
   xsigma=1/shat*np.sqrt(1./1836)
   xmax=xsigma*25
@@ -199,3 +198,7 @@ def Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar):
   print("****************")
   print("****************")
   return w0
+
+#Dispersion(4.,2.,0.05,0.005,0.05,0,0,0)
+
+

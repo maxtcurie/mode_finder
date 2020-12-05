@@ -172,9 +172,6 @@ ind_max  =max(range_ind)
 print('n=1, max omega is ' + str(omega_max) +'kHz')
 
 
-
-
-
 #******************End setting up ****************
 
 #****************Start scanning mode number*************

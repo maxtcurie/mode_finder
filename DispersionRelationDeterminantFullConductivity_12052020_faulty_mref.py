@@ -25,7 +25,7 @@ import numpy as np
 
 def A_maker(x_max, del_x, w1, v1,eta,alpha,beta,ky,ModIndex,mu,xstar):
     
-
+    mref=2.
     # making grid
     x_min = -x_max
     x_grid = np.arange(x_min, x_max+del_x, del_x)
@@ -104,7 +104,7 @@ def A_maker(x_max, del_x, w1, v1,eta,alpha,beta,ky,ModIndex,mu,xstar):
     L11_grid=np.arange(x_min, x_max+del_x, del_x,dtype=complex)
     L12grid=np.arange(x_min, x_max+del_x, del_x,dtype=complex)
     for i in range(num):
-        k= (2.*x_grid[i]*alpha*np.sqrt(1836.))/v1
+        k= (2.*x_grid[i]*alpha*np.sqrt(mref*1836.))/v1
         h1 = np.linalg.inv(1j*w_hat*np.identity(8)+VArray[0]-1j*(k**2/w_hat)*np.matmul(SMinusArray[1],SPlusArray[0])+k**2*np.matmul(np.matmul(SPlusArray[1],np.linalg.inv(
                 1j*w_hat*np.identity(8)+VArray[1]+ 
                 k**2*np.matmul(np.matmul(SPlusArray[2],np.linalg.inv(
@@ -129,10 +129,10 @@ def A_maker(x_max, del_x, w1, v1,eta,alpha,beta,ky,ModIndex,mu,xstar):
     #print(sigma_grid)
     #print(ModG)
     # computing the diagonal components of the matrix
-    a11 = ky**2 + 2j*1836*beta*sigma_grid
-    a12 = -4j*1836**1.5*alpha*beta*sigma_grid*x_grid
-    a21 = 4j*alpha*np.sqrt(1836)*sigma_grid/(w1*(w1+1))*x_grid
-    a22 = ky**2 - 8j*alpha**2*1836*sigma_grid/(w1*(w1+1))*x_grid**2
+    a11 = ky**2 + 2j*mref*1836*beta*sigma_grid
+    a12 = -4j*mref*1836**1.5*alpha*beta*sigma_grid*x_grid
+    a21 = 4j*alpha*np.sqrt(mref*1836)*sigma_grid/(w1*(w1+1))*x_grid
+    a22 = ky**2 - 8j*alpha**2*mref*1836*sigma_grid/(w1*(w1+1))*x_grid**2
     # populating the matrix with the components of the matrix
     # this loop populates the off-diagonal components coming from the finite difference
     for i in range(num-3):
@@ -178,12 +178,15 @@ def w_finder(x_max, del_x, w_guess, v,ne,alpha,beta,ky,ModIndex,mu,xstar):
     return w0
 
 def Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar):
+  mref=2.
   #Fit Parameters
+  xsigma=1./shat*np.sqrt(1./(mref*1836))
+  xmax=xsigma*25.
+  delx=xsigma/50.
+  
   ky=ky*np.sqrt(2.)
   mu=abs(mu)
-  xsigma=1/shat*np.sqrt(1./1836)
-  xmax=xsigma*25
-  delx=xsigma/50
+
 
   w0=w_finder(xmax,delx,1+eta,nu,eta,shat,beta,ky,ModIndex,mu,xstar)
   print("****************")

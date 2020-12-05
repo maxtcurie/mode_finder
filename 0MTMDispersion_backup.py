@@ -8,20 +8,18 @@ import numpy as np
 import pandas as pd
 from finite_differences import *
 import matplotlib.pyplot as plt
+from interp import *
 import math
 import csv
 from scipy import optimize
 
 
-from interp import interp
 from max_pedestal_finder import find_pedestal
 from max_pedestal_finder import find_pedestal_from_data
 from read_profiles import read_profile_file
 from read_profiles import read_geom_file
 from read_EFIT_file import get_geom_pars
 from max_stat_tool import *
-from max_profile_reader import profile_e_info
-from max_profile_reader import profile_i_info
 #from DispersionRelationDeterminant import Dispersion
 from DispersionRelationDeterminantFullConductivity import Dispersion
 
@@ -41,15 +39,15 @@ from DispersionRelationDeterminantFullConductivity import Dispersion
 #**************Block for user******************************************
 #**************Setting up*********************************************
 
-profile_type="profile"           # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="GENE_tracor"          # "gfile"  "GENE_tracor"
+profile_type="ITERDB"           # "ITERDB" "pfile" 
+geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-#geomfile_name = 'jet78697.51005_hager.eqdsk'
-geomfile_name = 'gene.dat'      #name of the magnetic geometry file
+geomfile_name = 'jet78697.51005_hager.eqdsk'
+#geomfile_name = 'gene.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -62,7 +60,7 @@ ModIndex=1
 
 omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
-q_scale=1. #0.949 #0.955
+q_scale=0.96 #0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
 n_max=12                               #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
@@ -204,9 +202,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     n0=1.
     mref = 2.        # mass of ion in proton mass
     
-    rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
-
-
+    rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name)
     if geomfile_type=="gfile": 
         xgrid, q = read_geom_file(geomfile_type,geomfile_name,suffix)
     elif geomfile_type=="GENE_tracor":
@@ -214,7 +210,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
 
     q=q*q_scale
 
-    if geomfile_type=="GENE_tracor" and profile_type!="profile":
+    if geomfile_type=="GENE_tracor":
         rhot0_range_min=np.argmin(abs(rhot0-xgrid[0]))
         rhot0_range_max=np.argmin(abs(rhot0-xgrid[-1]))
         rhot0=rhot0[rhot0_range_min:rhot0_range_max]

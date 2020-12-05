@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 from max_pedestal_finder import find_pedestal
 from read_iterdb_file import read_iterdb_file
@@ -8,6 +9,9 @@ from read_pfile import p_to_iterdb_format
 from read_EFIT import read_EFIT
 from read_write_geometry import read_geometry_global
 from parIOWrapper import init_read_parameters_file
+from max_profile_reader import profile_e_info
+from max_profile_reader import profile_i_info
+from interp import interp
 #Created by Max T. Curie  11/02/2020
 #Last edited by Max Curie 11/02/2020
 #Supported by scripts in IFS
@@ -39,7 +43,7 @@ def input():
     return profile_type, geomfile_type, profile_name, geomfile_name, suffix
     
 
-def read_profile_file(profile_type,profile_name,geomfile_name):
+def read_profile_file(profile_type,profile_name,geomfile_name,suffix):
     if profile_type=="ITERDB":
         rhot0, te0, ti0, ne0, ni0, nz0, vrot0 = read_iterdb_file(profile_name)
         psi0 = np.linspace(0.,1.,len(rhot0))
@@ -48,6 +52,55 @@ def read_profile_file(profile_type,profile_name,geomfile_name):
     elif profile_type=="pfile":
         rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = p_to_iterdb_format(profile_name,geomfile_name)
 
+    elif profile_type=="profile":
+        if suffix=="dat":
+            suffix=".dat"
+        else:
+            suffix="_"+suffix
+        rhot0, te0, ti0, ne0, ni0, nz0, vrot0 = read_iterdb_file(profile_name)
+        psi0 = np.linspace(0.,1.,len(rhot0))
+        rhop0 = np.sqrt(np.array(psi0))
+
+        x_a,x_rho_ref,T,n0,omt,omn = profile_e_info(suffix)
+        if 1==0:
+            plt.clf()
+            plt.plot(x_a,n0*1.0e19,label='profile')
+            plt.plot(rhot0,ne0,label='ITERDB')
+            #plt.plot(x_rho_ref,T,label='x_rho_ref')
+            plt.legend()
+            plt.show()
+
+            plt.clf()
+            plt.plot(x_a,T*1000.,label='profile')
+            plt.plot(rhot0,te0,label='ITERDB')
+            #plt.plot(x_rho_ref,T,label='x_rho_ref')
+            plt.legend()
+            plt.show()
+        #x_a,x_rho_ref,T,n0,omt,omn = profile_i_info(suffix)
+        
+        rhot0_range_min=np.argmin(abs(rhot0-x_a[0]))
+        rhot0_range_max=np.argmin(abs(rhot0-x_a[-1]))
+        rhot=rhot0[rhot0_range_min:rhot0_range_max]
+        rhop=rhop0[rhot0_range_min:rhot0_range_max]
+        ti=ti0[rhot0_range_min:rhot0_range_max]
+        ni=ni0[rhot0_range_min:rhot0_range_max]
+        vrot=vrot0[rhot0_range_min:rhot0_range_max]
+
+        rhot0 = np.linspace(min(rhot),max(rhot),len(rhot)*3.)
+        
+        rhop0=interp(rhot,rhop,rhot0)
+        te0 = interp(x_a,T*1000.,rhot0)
+        ti0=interp(rhot,ti,rhot0)
+        ni0=interp(rhot,ni,rhot0)
+        ne0 = interp(x_a,n0*1.0e19,rhot0)
+        vrot0=interp(rhot,vrot,rhot0)
+        
+        print("**************************")
+        print("**************************")
+        print("x_a min max: "+str(np.min(x_a))+", "+str(np.max(x_a)))
+        print("**************************")
+        print("**************************")
+        print("**************************")
 
     return rhot0, rhop0, te0, ti0, ne0, ni0, vrot0
 
@@ -76,5 +129,11 @@ def read_geom_file(file_type,file_name,suffix="dat"):
             xgrid = np.arange(pars['nx0'])/float(pars['nx0']-1)*pars['lx_a']+pars['x0']-pars['lx_a']/2.0
         else:
             xgrid = np.arange(pars['nx0'])/float(pars['nx0']-1)*pars['lx'] - pars['lx']/2.0
+        print("**************************")
+        print("**************************")
+        print("xgrid min max: "+str(np.min(xgrid))+", "+str(np.max(xgrid)))
+        print("**************************")
+        print("**************************")
+        print("**************************")
         return xgrid, q, Lref, Bref, x0_from_para
     
