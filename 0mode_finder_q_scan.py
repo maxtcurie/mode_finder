@@ -17,7 +17,7 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="ITERDB"           # "ITERDB" "pfile" 
+profile_type="profile"           # "ITERDB" "pfile", "profile_e", "profile_both" 
 geomfile_type="GENE_tracor"          # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
@@ -54,14 +54,14 @@ x0_center_pick=0.98
 
 plot = 0         #set to 1 if you want to plot the result
 
-rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name)
+rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
 if geomfile_type=="gfile": 
     xgrid, q = read_geom_file(geomfile_type,geomfile_name,suffix)
 elif geomfile_type=="GENE_tracor":
     xgrid, q, Lref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
 
 
-if geomfile_type=="GENE_tracor":
+if geomfile_type=="GENE_tracor" and profile_type!="profile":
     rhot0_range_min=np.argmin(abs(rhot0-xgrid[0]))
     rhot0_range_max=np.argmin(abs(rhot0-xgrid[-1]))
     rhot0=rhot0[rhot0_range_min:rhot0_range_max]

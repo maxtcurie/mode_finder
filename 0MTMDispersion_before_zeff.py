@@ -41,18 +41,17 @@ from DispersionRelationDeterminantFullConductivity import Dispersion
 #**************Block for user******************************************
 #**************Setting up*********************************************
 
-profile_type="profile_e"          # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="GENE_tracor"         # "gfile"  "GENE_tracor"
+profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
-#path=''
-#profile_name = 'DIIID175823.iterdb'
-profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+profile_name = 'DIIID174819.iterdb'
+#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-#geomfile_name = 'g175823.04108_257x257'
-#geomfile_name = path+'jet78697.51005_hager.eqdsk'
-geomfile_name = 'gene.dat'      #name of the magnetic geometry file
+geomfile_name = 'g174819.03090_646'
+#geomfile_name = 'jet78697.51005_hager.eqdsk'
+#geomfile_name = 'gene.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -61,22 +60,21 @@ suffix='dat'            	    #The suffix if one choose to use GENE_tracor for q 
 
 run_mode_finder=True        #Change to True if one want to run mode finder 
 run_nu_scan=False           #Change to True if one want to run collisionality scan 
-ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
+ModIndex=1 
 
 omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
-n_max=12                               #maximum mode number (include) that finder will cover
+n_max=4                               #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
-plot_profile=False                     #Set to True is user want to have the plot of the profile
+plot_profile=True                     #Set to True is user want to have the plot of the profile
 plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
 csv_profile=False                    #Set to True is user want to have the csv file "profile_output.csv" of the profile
 csv_n_scan=True                       #Set to True is user want to have the csv file "MTM_dispersion_n_scan.csv" of the gamma over n
 plot_spectrogram=False
 peak_of_plasma_frame=False             #Set to True if one want to look around the peak of omega*e in plasam frame
 
-zeff=2.5	#Effective charges due impurity
 Z=6.		#charge of impurity
 manual_ped=0
 mid_ped0=0.958
@@ -271,7 +269,6 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     te_u = te_u[index_begin:len(uni_rhot)-1]
     ne_u = ne_u[index_begin:len(uni_rhot)-1]
     ni_u = ni_u[index_begin:len(uni_rhot)-1]
-    #nz_u = nz_u[index_begin:len(uni_rhot)-1]
     vrot_u = vrot_u[index_begin:len(uni_rhot)-1]
     q      = q[index_begin:len(uni_rhot)-1]
     tprime_e = tprime_e[index_begin:len(uni_rhot)-1]
@@ -289,7 +286,6 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
 
     ne=ne_u/(10.**19.)      # in 10^19 /m^3
     ni=ni_u/(10.**19.)      # in 10^19 /m^3
-    #nz=nz_u/(10.**19.)      # in 10^19 /m^3
     te=te_u/1000.          #in keV
     m_SI = mref *1.6726*10**(-27)
     me_SI = 9.11*10**(-31)
@@ -297,7 +293,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     qref = 1.6*10**(-19)
     #refes to GENE manual
     coll_c=2.3031*10**(-5)*Lref*ne/(te)**2*(24-np.log(np.sqrt(ne*10**13)/(te*1000)))
-    coll_ei=4.*(ni/ne)*coll_c*np.sqrt(te*1000.*qref/me_SI)/Lref
+    coll_ei=4*(ni/ne)*coll_c*np.sqrt(te*1000.*qref/me_SI)/Lref
     nuei=coll_ei
     beta=403.*10**(-5)*ne*te/Bref**2.
 
@@ -308,7 +304,6 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     cref = np.sqrt(Tref / m_SI)
     Omegaref = qref * Bref / m_SI / c
     rhoref = cref / Omegaref 
-    rhoref_temp = rhoref * np.sqrt(te_u/te_mid) 
     kymin=n0*q0*rhoref/(Lref*x0_center)
     kyGENE =kymin * (q/q0) * np.sqrt(te_u/te_mid) * (x0_center/uni_rhot) #Add the effect of the q varying
     #from mtm_doppler
@@ -322,15 +317,14 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     omega_n=omega_n_GENE*gyroFreq/(2.*np.pi*1000.)  #in kHz
 
     
-    #zeff=(ni+nz*Z**2.)*(1./ni)
+    zeff=(ni+nz*Z**2.)*(1./ni)
 
-    #coll_ei=coll_ei/(1000.)  #in kHz
-    coll_ei=coll_ei/(2.*np.pi*1000.)  #in kHz
+    coll_ei=coll_ei/(1000.)  #in kHz
 
     shat=Ln/Lq
     eta=Ln/Lt
-    ky=kyGENE*np.sqrt(2.)
-    nu=(coll_ei)/(np.max(omega_n)*np.sqrt(2.)) *zeff**2.
+    ky=kyGENE
+    nu=(coll_ei)/(omega_n) 
 
     nuei=nu*omega_n_GENE/omega_n
 
@@ -338,37 +332,14 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
 
 
     if plot==True:
-        '''
         plt.clf()
         plt.plot(uni_rhot,nuei,label='nuei(cs/a)')
         plt.plot(uni_rhot,nuei*2.*np.pi,label='nuei(cs/a)*2 pi')
-        plt.plot(uni_rhot,nuei*zeff,label='nuei*zeff')
+        plt.plot(uni_rhot,nuei*zeff,label='nuei(cs/a)*2 pi')
         plt.legend()
         plt.title('nuei')
         plt.axvline(0.96,color='red',alpha=1.)
         plt.show()
-
-        index=np.argmin(abs(float(input("Enter location of interest:\n"))-uni_rhot))
-
-        print('zeff(x/r='+str(uni_rhot[index])+')='+str(zeff[index]))
-        #print('id(x/r='+str(rho)+')='+str(id[index]))
-        print('nuei*zeff(x/r='+str(uni_rhot[index])+')='+str((nuei*zeff)[index]))
-        print('nuei*2 pi(x/r='+str(uni_rhot[index])+')='+str((nuei*2.*np.pi)[index]))
-        '''
-        plt.clf()
-        #plt.title('mode number finder')
-        plt.xlabel('r/a')
-        plt.ylabel('omega*, kHz') 
-        plt.plot(uni_rhot,mtmFreq,label='omega*p')
-        plt.plot(uni_rhot,omega_n,label='omega*n')
-        plt.axvline(uni_rhot[np.argmax(mtmFreq)],color='red',alpha=1.,label='peak of omega*p')
-        plt.axvline(uni_rhot[np.argmax(omega_n)],color='green',alpha=1.,label='peak of omega*n')
-        plt.plot(uni_rhot,rhoref_temp,color='purple',label='rhoref')
-        plt.legend()
-        plt.show()
-
-        print("rho i for peak of omega*p: "+str(rhoref_temp[np.argmax(mtmFreq)]))
-        print("rho i for peak of omega*n: "+str(rhoref_temp[np.argmax(omega_n)]))
 
         plt.clf()
         plt.xlabel('r/a')

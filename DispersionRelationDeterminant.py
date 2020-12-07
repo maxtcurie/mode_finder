@@ -112,6 +112,9 @@ def w_finder(x_max, del_x, w_guess, v,ne,alpha,beta,ky,ModIndex,mu,xstar):
 def Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar):
   #Fit Parameters
   mu=abs(mu)
+  ky=ky*np.sqrt(2.)
+  #nu=nu*2.*np.pi
+
   xsigma=1/shat*np.sqrt(1./1836)
   xmax=xsigma*25
   delx=xsigma/50

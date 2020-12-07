@@ -59,15 +59,15 @@ geomfile_name = 'gene.dat'      #name of the magnetic geometry file
 suffix='dat'            	    #The suffix if one choose to use GENE_tracor for q profile
                                 #0001, 1, dat
 
-run_mode_finder=True        #Change to True if one want to run mode finder 
-run_nu_scan=False           #Change to True if one want to run collisionality scan 
-ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
+run_mode_finder=False        #Change to True if one want to run mode finder 
+run_nu_scan=True           #Change to True if one want to run collisionality scan 
+ModIndex=0 					# 1 is taking global effect, 0 is only local effect 
 
 omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
-n_max=12                               #maximum mode number (include) that finder will cover
+n_max=20                               #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
 plot_profile=False                     #Set to True is user want to have the plot of the profile
 plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
@@ -330,7 +330,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     shat=Ln/Lq
     eta=Ln/Lt
     ky=kyGENE*np.sqrt(2.)
-    nu=(coll_ei)/(np.max(omega_n)*np.sqrt(2.)) *zeff**2.
+    nu=(coll_ei)/(omega_n) *zeff**2.
 
     nuei=nu*omega_n_GENE/omega_n
 
@@ -819,7 +819,29 @@ def MTM_scan(profile_name,geomfile_name,q_scale,omega_percent,bins,n_min,n_max,p
 
 def coll_scan(profile_name,geomfile_name,q_scale,n0,plot_profile,plot_peak_scan,csv_profile,csv_peak_scan): 
     uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omega_n_GENE,xstar,Lref,rhoi=Parameter_reader(profile_name,geomfile_name,q_scale,manual_ped,mid_ped0,plot=plot_profile,output_csv=csv_profile)
-    peak_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFreq,omegaDoppler,n0,Lref,rhoi,ModIndex,xstar,plot_peak_scan,csv_peak_scan)
+    location=0.977999999999999
+    index=np.argmin(abs(uni_rhot-location))
+    LL_info=pd.read_csv('LL_info.csv')
+    
+    n_list=LL_info['4.n0_global']
+    ky_list=LL_info['1.kymin']
+    length=len(ky_list)
+    uni_rhot_list=[uni_rhot[index]]*length
+    nu_list=[nu[index]]/n_list
+    eta_list=[eta[index]]*length
+    shat_list=[shat[index]]*length
+    beta_list=[beta[index]]*length
+    mu_list=[0.]*length
+    xstar=10.
+    gamma,omega=Dispersion_list(uni_rhot_list,nu_list,eta_list,shat_list,beta_list,ky_list,ModIndex,mu_list,xstar,plot=False)
+    #gamma,omega,factor=Dispersion_list(uni_rhot_list,nu_list,eta_list,shat_list,beta_list,ky_list,ModIndex,mu,xstar,plot=False)
+    gamma_cs_a=gamma*omega_n_GENE[index]*ky_list/ky[index]
+    
+    if csv_peak_scan==True:
+        d = {'n':n_list,'nu':nu_list,'ky':ky_list,'eta':eta_list,'shat':shat_list,'beta':beta_list,'gamma_cs_a':gamma_cs_a}
+        df=pd.DataFrame(d, columns=['n','nu','ky','eta','shat','beta','gamma_cs_a'])
+        df.to_csv('ky_scan.csv',index=False)
+
 
 if run_mode_finder==True:
     x_list,n_list,m_list,gamma_list,omega_list=MTM_scan(profile_name,geomfile_name,q_scale,omega_percent,bins,n_min,n_max,plot_profile,plot_n_scan,csv_profile,csv_n_scan)

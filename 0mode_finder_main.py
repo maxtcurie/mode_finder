@@ -17,29 +17,29 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="ITERDB"           # "ITERDB" "pfile" 
+profile_type="ITERDB"           # "ITERDB" "pfile", "profile_e", "profile_both" 
 geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+profile_name = path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 geomfile_name = 'jet78697.51005_hager.eqdsk'
-#geomfile_name = 'g162940.02944_670'             #name of the magnetic geometry file
+#geomfile_name = 'gene.dat'             #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
 suffix='dat'                   #The suffix if one choose to use GENE_tracor for q profile
                                 #0001, 1, dat
 
-f_max=200      #upper bound of the frequency experimentally observed 
+f_max=400.     #upper bound of the frequency experimentally observed 
 f_min=0        #lower bound of the frequency experimentally observed 
 plot = 1         #set to 1 if you want to plot the result
 report=1         #set to 1 if you want to export a csv report
-omega_percent=20.  #choose the omega within the top that percent defined in(0,100)
+omega_percent=40.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
 n0_max=12      #maximum mode number (include) that finder will cover
-q_scale= 1.       #set the q to q*q_scale
+q_scale= 0.949       #set the q to q*q_scale
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 
 x0_center_choose=0  #change to 1 if one wants to choose mid-pedestal manually 
@@ -50,7 +50,12 @@ x0_center_pick=0.98
 
 
 #*************Loading the data******************************************
-rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name)
+if profile_type=="ITERDB":
+    rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+else:
+    rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+
+
 if geomfile_type=="gfile": 
     xgrid, q = read_geom_file(geomfile_type,geomfile_name,suffix)
 elif geomfile_type=="GENE_tracor":
@@ -58,7 +63,7 @@ elif geomfile_type=="GENE_tracor":
 
 q=q*q_scale
 
-if geomfile_type=="GENE_tracor":
+if geomfile_type=="GENE_tracor" and profile_type!="profile":
     rhot0_range_min=np.argmin(abs(rhot0-xgrid[0]))
     rhot0_range_max=np.argmin(abs(rhot0-xgrid[-1]))
     rhot0=rhot0[rhot0_range_min:rhot0_range_max]
@@ -318,14 +323,16 @@ for i in range(len(uni_rhot)):
     if uni_rhot[i]<=x_max and uni_rhot[i]>=x_min:
         x_zoom.append(uni_rhot[i])
         q_zoom.append(q[i])
-        f_zoom.append(mtmFreq[i] + omegaDoppler[i])
+        #f_zoom.append(mtmFreq[i] + omegaDoppler[i])
+        f_zoom.append(mtmFreq[i])
 
 
 plt.clf()
 plt.title('Summary plot')
 plt.xlabel('r/a')
 plt.ylabel('a.u.') 
-plt.plot(x_zoom,f_zoom/np.max(f_zoom),label='Diamagnetic plus Doppler frequency(MTM in lab frame)')
+#plt.plot(x_zoom,f_zoom/np.max(f_zoom),label='Diamagnetic plus Doppler frequency(MTM in lab frame)')
+plt.plot(x_zoom,f_zoom/np.max(f_zoom),label='Diamagnetic frequency')
 plt.plot(x_zoom,q_zoom/np.max(q_zoom),label='Safety factor')
 for i in range(len(n0_range)):
    plt.axvline(x_range[i],color='red',alpha=0.2)#alpha control the transparency, alpha=0 transparency, alpha=1 solid
