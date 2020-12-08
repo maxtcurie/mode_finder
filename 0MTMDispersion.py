@@ -41,17 +41,21 @@ from DispersionRelationDeterminantFullConductivity import Dispersion
 #**************Block for user******************************************
 #**************Setting up*********************************************
 
-profile_type="profile_e"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
 geomfile_type="GENE_tracor"         # "gfile"  "GENE_tracor"
 
+#path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 #path=''
 #profile_name = 'DIIID175823.iterdb'
+#profile_name = path+'DIIID162940.iterdb'
 profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 #geomfile_name = 'g175823.04108_257x257'
 #geomfile_name = path+'jet78697.51005_hager.eqdsk'
+#geomfile_name = 'tracer_efit.dat'
+
 geomfile_name = 'gene.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
@@ -76,7 +80,7 @@ csv_n_scan=True                       #Set to True is user want to have the csv 
 plot_spectrogram=False
 peak_of_plasma_frame=False             #Set to True if one want to look around the peak of omega*e in plasam frame
 
-zeff=2.5	#Effective charges due impurity
+zeff=2.35	#Effective charges due impurity
 Z=6.		#charge of impurity
 manual_ped=0
 mid_ped0=0.958
@@ -95,8 +99,8 @@ nu_percent=10  #about the nu0 for x% 1=100%
 
 #Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar)
 
-def gaussian(x, amplitude, mean, stddev):
-    return amplitude * np.exp(-((x - mean) / stddev)**2)
+def gaussian_max(x, amplitude, mean, stddev):
+    return amplitude * np.exp(-((x - mean) / (1.*stddev))**2.)
 
 def gaussian_fit(x,data):
     x,data=np.array(x), np.array(data)
@@ -105,13 +109,13 @@ def gaussian_fit(x,data):
     judge=0
 
     try:
-        popt, pcov = optimize.curve_fit(gaussian, x,data)  
+        popt, pcov = optimize.curve_fit(gaussian_max, x,data)  
 
         max_index=np.argmax(data)
         
         plt.clf()
         plt.plot(x,data, label="data")
-        plt.plot(x, gaussian(x, *popt), label="fit")
+        plt.plot(x, gaussian_max(x, *popt), label="fit")
         plt.axvline(x[max_index],color='red',alpha=0.5)
         plt.axvline(x[max_index]+popt[2],color='red',alpha=0.5)
         plt.axvline(x[max_index]-popt[2],color='red',alpha=0.5)
@@ -142,10 +146,10 @@ def gaussian_fit(x,data):
 
             plt.clf()
             plt.plot(x,data, label="data")
-            plt.plot(x, gaussian(x, *popt), label="fit")
+            plt.plot(x, gaussian_max(x, *popt), label="fit")
             plt.axvline(x[max_index],color='red',alpha=0.5)
-            plt.axvline(x[max_index]+popt[2],color='red',alpha=0.5)
-            plt.axvline(x[max_index]-popt[2],color='red',alpha=0.5)
+            plt.axvline(x[max_index]+popt[2]/np.sqrt(2.),color='red',alpha=0.5)
+            plt.axvline(x[max_index]-popt[2]/np.sqrt(2.),color='red',alpha=0.5)
             plt.legend()
             plt.show()
 
@@ -163,10 +167,10 @@ def gaussian_fit(x,data):
 
         plt.clf()
         plt.plot(x,data, label="data")
-        plt.plot(x, gaussian(x, *popt), label="fit")
+        plt.plot(x, gaussian_max(x, *popt), label="fit")
         plt.axvline(x[max_index],color='red',alpha=0.5)
-        plt.axvline(x[max_index]+popt[2],color='red',alpha=0.5)
-        plt.axvline(x[max_index]-popt[2],color='red',alpha=0.5)
+        plt.axvline(x[max_index]+popt[2]/np.sqrt(2.),color='red',alpha=0.5)
+        plt.axvline(x[max_index]-popt[2]/np.sqrt(2.),color='red',alpha=0.5)
         plt.legend()
         plt.show()
 
@@ -197,7 +201,7 @@ def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
     if show==True:
         plt.clf()
         plt.plot(x,data, label="data")
-        plt.plot(x, gaussian(x, *popt), label="fit")
+        plt.plot(x, gaussian0(x, *popt), label="fit")
         plt.legend()
         plt.show()
 
@@ -330,11 +334,11 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     shat=Ln/Lq
     eta=Ln/Lt
     ky=kyGENE*np.sqrt(2.)
-    nu=(coll_ei)/(np.max(omega_n)*np.sqrt(2.)) *zeff**2.
+    nu=(coll_ei)/(np.max(omega_n)) *zeff**2.
 
     nuei=nu*omega_n_GENE/omega_n
 
-    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,plot)
+    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref/np.sqrt(2.),Lref,plot)
 
 
     if plot==True:

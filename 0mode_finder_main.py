@@ -17,29 +17,46 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="ITERDB"           # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="gfile"          # "gfile"  "GENE_tracor"
+profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/jet78697/'
-profile_name = path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+#path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+#path=''
+#profile_name = 'DIIID175823.iterdb'
+#profile_name = 'p169509.03069_416'	#1
+#profile_name = 'p169509.04218_465'	#2
+profile_name = 'p169510.01966_108'	#3
+#profile_name = 'p169510.03090_595'	#4
+#profile_name = 'g169510.04069_173'	#5
+#profile_name = path+'DIIID162940.iterdb'
+#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = 'jet78697.51005_hager.eqdsk'
-#geomfile_name = 'gene.dat'             #name of the magnetic geometry file
+#geomfile_name = 'g175823.04108_257x257'
+#geomfile_name = path+'jet78697.51005_hager.eqdsk'
+#geomfile_name = 'tracer_efit.dat'
+#geomfile_name = 'g169509.03069_416'	#1
+#geomfile_name = 'g169509.04218_465'	#2
+geomfile_name = 'g169510.01966_108'	#3
+#geomfile_name = 'g169510.03090_595'	#4
+#geomfile_name = 'p169510.04069_173'	#5
+
+
+#geomfile_name = 'gene.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
 suffix='dat'                   #The suffix if one choose to use GENE_tracor for q profile
                                 #0001, 1, dat
 
-f_max=400.     #upper bound of the frequency experimentally observed 
+f_max=200.     #upper bound of the frequency experimentally observed 
 f_min=0        #lower bound of the frequency experimentally observed 
 plot = 1         #set to 1 if you want to plot the result
 report=1         #set to 1 if you want to export a csv report
-omega_percent=40.  #choose the omega within the top that percent defined in(0,100)
+omega_percent=5.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
-n0_max=12      #maximum mode number (include) that finder will cover
-q_scale= 0.949       #set the q to q*q_scale
+n0_max=20      #maximum mode number (include) that finder will cover
+q_scale= 1.       #set the q to q*q_scale
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 
 x0_center_choose=0  #change to 1 if one wants to choose mid-pedestal manually 
