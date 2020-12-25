@@ -17,32 +17,39 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
 geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
 #path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-#path=''
-#profile_name = 'DIIID175823.iterdb'
-#profile_name = 'p169509.03069_416'	#1
-#profile_name = 'p169509.04218_465'	#2
-profile_name = 'p169510.01966_108'	#3
-#profile_name = 'p169510.03090_595'	#4
-#profile_name = 'g169510.04069_173'	#5
-#profile_name = path+'DIIID162940.iterdb'
-#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+profile_name_list=['jet82482_usrlfrassin_ddaT008_t157_t259_hager_remapTrue.iterdb',\
+					'jet86582_usrlfrassin_ddaT063_t147_t249_sauter_remapTrue.iterdb',\
+					'jet83324_usrlfrassin_ddaT003_t145_t247_hager_remapTrue.iterdb',\
+					'jet82193_usrlfrassin_ddaT006_t149_t251_hager_remapTrue.iterdb',\
+					'jet84541_usrlfrassin_ddaT052_t146_t247_hager_remapTrue.iterdb'\
+					'jet84542_usrlfrassin_ddaT028_t144_t245_hager_remapTrue.iterdb',\
+					'jet84545_usrlfrassin_ddaT026_t144_t246_hager_remapTrue.iterdb']
+
+geomfile_name_list=['jet82482_usrlfrassin_ddaT008_t157_t259_hager_remapTrue.eqdsk',\
+					'jet86582_usrlfrassin_ddaT063_t147_t249_sauter_remapTrue.eqdsk',\
+					'jet83324_usrlfrassin_ddaT003_t145_t247_hager_remapTrue.eqdsk',\
+					'jet82193_usrlfrassin_ddaT006_t149_t251_hager_remapTrue.eqdsk',\
+					'jet84541_usrlfrassin_ddaT052_t146_t247_hager_remapTrue.eqdsk',\
+					'jet84542_usrlfrassin_ddaT028_t144_t245_hager_remapTrue.eqdsk',\
+					'jet84545_usrlfrassin_ddaT026_t144_t246_hager_remapTrue.eqdsk',]
+
+profile_name =profile_name_list[2] 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-#geomfile_name = 'g175823.04108_257x257'
-#geomfile_name = path+'jet78697.51005_hager.eqdsk'
-#geomfile_name = 'tracer_efit.dat'
-#geomfile_name = 'g169509.03069_416'	#1
-#geomfile_name = 'g169509.04218_465'	#2
-geomfile_name = 'g169510.01966_108'	#3
-#geomfile_name = 'g169510.03090_595'	#4
-#geomfile_name = 'p169510.04069_173'	#5
 
+geomfile_name = geomfile_name_list[2]      #name of the magnetic geometry file
+                                            #g000000
+                                            #tracer_efit.dat
 
-#geomfile_name = 'gene.dat'      #name of the magnetic geometry file
+profile_name ='jet78697.51005_hager_Z6.0Zeff2.35__negom.iterdb' 		#name of the profile file
+                                            #DIIID175823.iterdb
+                                            #p000000
+
+geomfile_name = 'jet78697.51005_hager.eqdsk'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -55,12 +62,12 @@ plot = 1         #set to 1 if you want to plot the result
 report=1         #set to 1 if you want to export a csv report
 omega_percent=5.  #choose the omega within the top that percent defined in(0,100)
 n0_min=1         #minmum mode number (include) that finder will cover
-n0_max=20      #maximum mode number (include) that finder will cover
+n0_max=12      #maximum mode number (include) that finder will cover
 q_scale= 1.       #set the q to q*q_scale
 mref = 2.        # mass of ion in proton mass, D=2.  ,T=3. 
 
 x0_center_choose=0  #change to 1 if one wants to choose mid-pedestal manually 
-x0_center_pick=0.98
+x0_center_pick=0.962
 #**************End of Setting up*********************************************
 #**************End of Block for user******************************************
 
@@ -74,9 +81,9 @@ else:
 
 
 if geomfile_type=="gfile": 
-    xgrid, q = read_geom_file(geomfile_type,geomfile_name,suffix)
+    xgrid, q, R_ref= read_geom_file(geomfile_type,geomfile_name,suffix)
 elif geomfile_type=="GENE_tracor":
-    xgrid, q, Lref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
+    xgrid, q, Lref, R_ref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
 
 q=q*q_scale
 

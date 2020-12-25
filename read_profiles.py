@@ -112,11 +112,28 @@ def read_geom_file(file_type,file_name,suffix="dat"):
         # even grid of psi_pol, on which all 1D fields are defined
         xgrid = EFITdict['psipn']
         q = EFITdict['qpsi']
-        return xgrid, q
+        R = EFITdict['R']
+        print("**************************")
+        print("**************************")
+        print(str(R))
+        print(np.shape(R))
+        R_ref=R[int(len(R)/2)]
+        print("**************************")
+        print("**************************")
+        return xgrid, q, R_ref
         
     elif file_type=="GENE_tracor":
         gpars,geometry = read_geometry_global(file_name)
         q=geometry['q']
+        R=geometry['geo_R']
+        print("**************************")
+        print("**************************")
+        print(str(R))
+        print(np.shape(R))
+        (nz0,nx0)=np.shape(R)
+        R_ref=R[int(nz0/2),int(nx0/2)]
+        print("**************************")
+        print("**************************")
         
         if suffix=="dat":
             suffix=".dat"
@@ -125,6 +142,7 @@ def read_geom_file(file_type,file_name,suffix="dat"):
 
         pars = init_read_parameters_file(suffix)
         Lref=pars['Lref']
+
         Bref=pars['Bref']
         x0_from_para=pars['x0']
         if 'lx_a' in pars:
@@ -137,5 +155,5 @@ def read_geom_file(file_type,file_name,suffix="dat"):
         print("**************************")
         print("**************************")
         print("**************************")
-        return xgrid, q, Lref, Bref, x0_from_para
+        return xgrid, q, Lref, R_ref, Bref, x0_from_para
     

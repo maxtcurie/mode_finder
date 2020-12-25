@@ -5,11 +5,11 @@ from read_iterdb_file import read_iterdb_file
 
 
 
-path='/global/u1/m/maxcurie/max/Cases/jet78697/'
-profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+#path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
 
-#path='/global/u1/m/maxcurie/max/Cases/DIIID175823_250k/'
-#profile_name =path+'DIIID175823.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/DIIID175823_250k/'
+profile_name =path+'DIIID175823.iterdb' 		#name of the profile file
 
 rho0, Te, Ti, ne, ni, nz, vrot = read_iterdb_file(profile_name)
 
