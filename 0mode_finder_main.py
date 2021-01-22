@@ -20,7 +20,7 @@ from read_EFIT_file import get_geom_pars
 profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
 geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
-#path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
 profile_name_list=['jet82482_usrlfrassin_ddaT008_t157_t259_hager_remapTrue.iterdb',\
 					'jet86582_usrlfrassin_ddaT063_t147_t249_sauter_remapTrue.iterdb',\
 					'jet83324_usrlfrassin_ddaT003_t145_t247_hager_remapTrue.iterdb',\
@@ -45,11 +45,12 @@ geomfile_name = geomfile_name_list[2]      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
-profile_name ='jet78697.51005_hager_Z6.0Zeff2.35__negom.iterdb' 		#name of the profile file
+profile_name =path+'DIIID162940.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 
-geomfile_name = 'jet78697.51005_hager.eqdsk'      #name of the magnetic geometry file
+geomfile_name = 'g162940.02944_670'
+#geomfile_name = 'tracer_efit.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -99,7 +100,7 @@ if geomfile_type=="GENE_tracor" and profile_type!="profile":
     vrot0=vrot0[rhot0_range_min:rhot0_range_max]
 
 
-uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10.)
+uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
 
 te_u = interp(rhot0,te0,uni_rhot)
 ne_u = interp(rhot0,ne0,uni_rhot)

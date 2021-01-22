@@ -7,14 +7,15 @@ from read_EFIT import *
 from read_EFIT_file import *
 from read_iterdb_file import *
 from max_pedestal_finder import find_pedestal
+import matplotlib.gridspec as gridspec
 #Last edited by Max Curie 06/10/2020
 #Supported by David R Hatch's script mtmDopplerFreqs.py
 
 
 #**************Block for user******************************************
 #**************Setting up*********************************************
-iterdb_file_name = 'fullDIIID98889.iterdb' #name of the iterdb file
-geomfile = 'g098889.04530'                     #name of the magnetic geometry file
+iterdb_file_name = 'DIIID175823.iterdb' #name of the iterdb file
+geomfile = 'g175823.04108_257x257'                     #name of the magnetic geometry file
 
 f_max=250      #upper bound of the frequency experimentally observed 
 f_min=0        #lower bound of the frequency experimentally observed 
@@ -36,7 +37,7 @@ EFITdict = read_EFIT(geomfile)
 xgrid = EFITdict['psipn']
 q = EFITdict['qpsi']*q_scale
 
-uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10.)
+uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
 
 te_u = interp(rhot0,te0,uni_rhot)
 ne_u = interp(rhot0,ne0,uni_rhot)
@@ -65,6 +66,7 @@ uni_rhot = uni_rhot[index_begin:len(uni_rhot)-1]
 
 center_index = np.argmin(abs(uni_rhot-x0_center))
 
+
 #*************End of loading the data******************************************
 
 #****************Start setting up ******************
@@ -81,6 +83,43 @@ Tref = te * qref
 cref = np.sqrt(Tref / m_SI)
 Omegaref = qref * Bref / m_SI / c
 rhoref = cref / Omegaref 
+
+ky=q0*rhoref/(Lref*x0_center)
+kymin = ky
+te_mid = te_u[center_index]
+kyGENE =kymin * (q/q0) * np.sqrt(te_u/te_mid) * (x0_center/uni_rhot) #Add the effect of the q varying
+#***Calculate omeage star********************************
+#from mtm_doppler
+omMTM = kyGENE*(tprime_e+nprime_e)
+gyroFreq = 9.79E3/np.sqrt(mref)*np.sqrt(te_u)/Lref
+#print("gyroFreq="+str(gyroFreq[center_index]))
+mtmFreq = omMTM*gyroFreq/2./np.pi/1000.
+
+fontsize0=12
+fig, ax=plt.subplots(nrows=2,ncols=2,sharex=True) 
+            #nrows is the total rows
+            #ncols is the total columns
+            #sharex true means the xaxies will be shared
+ax[0,0].plot(uni_rhot,te_u,label=r'$T_e$')
+#ax[0,0].set_xlabel('x')
+ax[0,0].set_ylabel(r'$T_e$',fontsize=fontsize0)
+#ax1.set_title()        #for the set the title name
+ax[0,1].plot(uni_rhot,ne_u,label=r'$n_e$')
+#ax[0,1].set_xlabel('x')
+ax[0,1].set_ylabel(r'$n_e$',fontsize=fontsize0)
+ax[1,0].plot(uni_rhot,mtmFreq,label=r'$\omega_{*e}$')
+ax[1,0].set_xlabel(r'$\rho_{tor}$',fontsize=fontsize0)
+ax[1,0].set_ylabel(r'$\omega_{*e}$',fontsize=fontsize0)
+ax[1,1].plot(uni_rhot,q,label='Safety factor')
+ax[1,1].set_xlabel(r'$\rho_{tor}$',fontsize=fontsize0)
+ax[1,1].set_ylabel('Safety factor',fontsize=fontsize0)
+#for i in range(2):
+#   for j in range(2):
+#       ax[i,j].legend()
+
+plt.tight_layout()
+plt.show()
+
 #******************End setting up ****************
 
 #****************Start scanning mode number*************

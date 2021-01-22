@@ -17,15 +17,13 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="ITERDB"           # "ITERDB" "pfile" 
-geomfile_type="gfile"          # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/jet78697/'
-profile_name = path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
+path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+#profile_name = path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
-geomfile_name = path+'jet78697.51005_hager.eqdsk'
-gene_geomfile_name = 'gene.dat'
+geomfile_name = path+'g162940.02944_670'
+gene_geomfile_name = 'tracer_efit.dat'
 gene_geomfile_name2 = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'
 #geomfile_name = 'g162940.02944_670'             #name of the magnetic geometry file
                                             #g000000
@@ -36,7 +34,7 @@ suffix='dat'                   #The suffix if one choose to use GENE_tracor for 
 
 plt.clf()
 xgrid, q , R_ref= read_geom_file("gfile",geomfile_name,suffix)
-plt.plot(xgrid, q*0.959,label="gfile")
+plt.plot(xgrid, q,label="gfile")
 xgrid, q, Lref, R_ref, Bref, x0_from_para = read_geom_file("GENE_tracor",gene_geomfile_name,suffix)
 plt.plot(xgrid, q,label="GENE_tracor")
 #xgrid, q, Lref, R_ref, Bref, x0_from_para = read_geom_file("GENE_tracor",gene_geomfile_name2,suffix)

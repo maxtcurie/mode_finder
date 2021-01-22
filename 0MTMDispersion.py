@@ -12,7 +12,6 @@ import math
 import csv
 from scipy import optimize
 
-
 from interp import interp
 from max_pedestal_finder import find_pedestal
 from max_pedestal_finder import find_pedestal_from_data
@@ -22,7 +21,6 @@ from read_EFIT_file import get_geom_pars
 from max_stat_tool import *
 from max_profile_reader import profile_e_info
 from max_profile_reader import profile_i_info
-#from DispersionRelationDeterminant import Dispersion
 from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 
 #The following function computes the growth rate of the slab MTM. The input are the physical parameters and it outputs the growth rate in units of omega_{*n}
@@ -67,7 +65,7 @@ run_mode_finder=True        #Change to True if one want to run mode finder
 run_nu_scan=False           #Change to True if one want to run collisionality scan 
 ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
 
-omega_percent=40.                       #choose the omega within the top that percent defined in(0,100)
+omega_percent=20.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
@@ -237,7 +235,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
         ni0=ni0[rhot0_range_min:rhot0_range_max]
         vrot0=vrot0[rhot0_range_min:rhot0_range_max]
 
-    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10.)
+    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
 
     te_u = interp(rhot0,te0,uni_rhot)
     ne_u = interp(rhot0,ne0,uni_rhot)
@@ -375,6 +373,12 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
         plt.ylabel('nuei(kHZ)') 
         plt.plot(uni_rhot,nu*np.max(omega_n),label='coll')
         plt.show()
+
+        d = {'uni_rhot':uni_rhot,'nu*np.max(omega_n)':nu*np.max(omega_n)}
+        df=pd.DataFrame(d, columns=['uni_rhot','nu*np.max(omega_n)'])
+        df.to_csv('0nu_ei_smooth.csv',index=False)
+
+
 
         plt.clf()
         #plt.title('mode number finder')
@@ -600,7 +604,17 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
         
         #gamma,omega,factor=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
         x0_list, m0_list=Rational_surface(uni_rhot_top,q_top,n0)
-        #print(x_list)
+        print(x_list)
+    bool_temp=input('countinue? ')
+    for n0 in range(n_min,n_max+1):
+        print("************n="+str(n0)+"************")
+
+        #gamma,omega=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
+        
+        #gamma,omega,factor=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
+        x0_list, m0_list=Rational_surface(uni_rhot_top,q_top,n0)
+        print(x_list)
+
         #if plot==True: # and np.max(gamma)>0:
             #plt.plot(uni_rhot,gamma)   #,label='n='+str(n0))
 

@@ -109,8 +109,9 @@ def read_profile_file(profile_type,profile_name,geomfile_name,suffix):
 def read_geom_file(file_type,file_name,suffix="dat"):
     if file_type=="gfile":
         EFITdict = read_EFIT(file_name)
-        # even grid of psi_pol, on which all 1D fields are defined
-        xgrid = EFITdict['psipn']
+        
+        xgrid = EFITdict['rhotn'] #rho_tor
+
         q = EFITdict['qpsi']
         R = EFITdict['R']
         print("**************************")
@@ -145,6 +146,7 @@ def read_geom_file(file_type,file_name,suffix="dat"):
 
         Bref=pars['Bref']
         x0_from_para=pars['x0']
+        #xgrid=rho_tor
         if 'lx_a' in pars:
             xgrid = np.arange(pars['nx0'])/float(pars['nx0']-1)*pars['lx_a']+pars['x0']-pars['lx_a']/2.0
         else:
