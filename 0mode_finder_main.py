@@ -51,6 +51,11 @@ profile_name =path+'DIIID162940.iterdb' 		#name of the profile file
 
 geomfile_name = 'g162940.02944_670'
 #geomfile_name = 'tracer_efit.dat'      #name of the magnetic geometry file
+profile_name ='DIIID162940.iterdb' 		#name of the profile file
+                                            #DIIID175823.iterdb
+                                            #p000000
+
+geomfile_name = 'g162940.02944_670'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
