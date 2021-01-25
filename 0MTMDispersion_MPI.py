@@ -47,14 +47,14 @@ path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 #path=''
 #profile_name = 'DIIID175823.iterdb'
 #profile_name = path+'DIIID162940.iterdb'
-profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb'		#name of the profile file
+profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 #geomfile_name = 'g175823.04108_257x257'
 #geomfile_name = 'jet78697.51005_hager.eqdsk'
 #geomfile_name = 'tracer_efit.dat'
 
-geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'     #name of the magnetic geometry file
+geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -65,7 +65,7 @@ run_mode_finder=True        #Change to True if one want to run mode finder
 run_nu_scan=False           #Change to True if one want to run collisionality scan 
 ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
 
-omega_percent=10.                      #choose the omega within the top that percent defined in(0,100)
+omega_percent=20.                       #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
 n_min=1                                #minmum mode number (include) that finder will cover
@@ -78,7 +78,7 @@ csv_n_scan=True                       #Set to True is user want to have the csv 
 plot_spectrogram=False
 peak_of_plasma_frame=False             #Set to True if one want to look around the peak of omega*e in plasam frame
 
-zeff=2.35	#Effective charges due impurity
+zeff=np.sqrt(1.628521978186096)	#Effective charges due impurity
 Z=6.		#charge of impurity
 manual_ped=0
 mid_ped0=0.958
@@ -86,7 +86,7 @@ mid_ped0=0.958
 
 #******For scaning********
 scan_n0=3.
-choose_location=False    #Change to True if one wants to change the location manually 
+choose_location=True    #Change to True if one wants to change the location manually 
 location=0.984139203080616
 plot_peak_scan=True
 csv_peak_scan=True
@@ -94,10 +94,6 @@ nu_percent=10  #about the nu0 for x% 1=100%
 #**************End of Setting up*********************************************
 #**************End of Block for user******************************************
 
-with open('W_auto_log.csv', 'w') as csvfile:		#clear all and then write a row
-    data = csv.writer(csvfile, delimiter=',')
-    data.writerow(['w0_guess','w0','oddness','nu','Zeff','eta','shat','beta','ky','ModIndex','mu','xstar'])
-csvfile.close()
 
 #Dispersion(nu,eta,shat,beta,ky,ModIndex,mu,xstar)
 
@@ -186,50 +182,8 @@ def gaussian_fit(x,data):
     return amplitude,mean,stddev
 
 
-def gaussian_fit_auto(x,data):
-    x,data=np.array(x), np.array(data)
-
-    #warnings.simplefilter("error", OptimizeWarning)
-    judge=0
-
-    try:
-        popt, pcov = optimize.curve_fit(gaussian_max, x,data)  
-        print(gaussian_max)
-        print(popt)
-        print(pcov)
-
-        max_index=np.argmax(data)
-        if 0==1:
-            plt.clf()
-            plt.plot(x,data, label="data")
-            plt.plot(x, gaussian_max(x, *popt), label="fit")
-            plt.axvline(x[max_index],color='red',alpha=0.5)
-            plt.axvline(x[max_index]+popt[2],color='red',alpha=0.5)
-            plt.axvline(x[max_index]-popt[2],color='red',alpha=0.5)
-            plt.legend()
-            plt.show()
-
-        error_temp=np.sum(abs(data-gaussian_max(x, *popt)))/abs(np.sum(data))
-        print('norm_error='+str(error_temp))
-        if error_temp<0.2:
-            amplitude=popt[0]
-            mean     =popt[1]
-            stddev   =popt[2] 
-        else:
-            print("Curve fit failed, need to restrict the range")
-            amplitude=0
-            mean     =0
-            stddev   =0
-    except RuntimeError:
-        print("Curve fit failed, need to restrict the range")
-        amplitude=0
-        mean     =0
-        stddev   =0
-
-    return amplitude,mean,stddev
-
 def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
-    amplitude,mean,stddev=gaussian_fit_auto(x,data)
+    amplitude,mean,stddev=gaussian_fit(x,data)
 
     mean_rho=mean*Lref/rhoref         #normalized to rhoi
     xstar=abs(stddev*Lref/rhoref)
@@ -394,9 +348,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     nuei=nu*omega_n_GENE/omega_n
 
     mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
-    
-    if abs(mean_rho) + abs(xstar)<0.0001:
-        quit() 
+
 
     if plot==True:
         if profile_type=="ITERDB0":
@@ -539,7 +491,7 @@ def Rational_surface(uni_rhot,q,n0):
     m_max = math.floor(qmax*n0)
     mnums = np.arange(m_min,m_max+1)
 
-    #print(m_min,m_max)
+    print(m_min,m_max)
     #or m in range(m_min,m_max+1):
     for m in mnums:
     	#print(m)
@@ -601,7 +553,6 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
     beta_top=beta[ind_min:ind_max]
     ky_top=ky[ind_min:ind_max]
     q_top=q[ind_min:ind_max]
-    print("q="+str(min(q_top))+"~"+str(max(q_top)))
     omega_n_top=omega_n[ind_min:ind_max]
     omega_n_GENE_top=omega_n_GENE[ind_min:ind_max]
     omegaDoppler_top=omegaDoppler[ind_min:ind_max]
@@ -646,7 +597,6 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             data = csv.writer(csvfile, delimiter=',')
             data.writerow([   'x/a',     'n',      'm',      'gamma(kHz)',      'gamma(cs/a)',    'nu_ei(kHz)','omega*/omega*_max' ,'omega_plasma(kHz)','omega_lab(kHz)',   'omega_star_plasma(kHz)','omega_star_lab(kHz)','nu', 'eta', 'shat', 'beta', 'ky', 'mu', 'xstar'])
             csvfile.close()
-    
     for n0 in range(n_min,n_max+1):
         print("************n="+str(n0)+"************")
 
@@ -654,6 +604,16 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
         
         #gamma,omega,factor=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
         x0_list, m0_list=Rational_surface(uni_rhot_top,q_top,n0)
+        print(x_list)
+    bool_temp=input('countinue? ')
+    for n0 in range(n_min,n_max+1):
+        print("************n="+str(n0)+"************")
+
+        #gamma,omega=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
+        
+        #gamma,omega,factor=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
+        x0_list, m0_list=Rational_surface(uni_rhot_top,q_top,n0)
+        print(x_list)
 
         #if plot==True: # and np.max(gamma)>0:
             #plt.plot(uni_rhot,gamma)   #,label='n='+str(n0))

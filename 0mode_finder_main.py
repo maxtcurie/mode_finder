@@ -18,9 +18,9 @@ from read_EFIT_file import get_geom_pars
 #**************Block for user*****************************************
 #**************Setting up*********************************************
 profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="gfile"         # "gfile"  "GENE_tracor"
+geomfile_type="GENE_tracor"         # "gfile"  "GENE_tracor"
 
-path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 profile_name_list=['jet82482_usrlfrassin_ddaT008_t157_t259_hager_remapTrue.iterdb',\
 					'jet86582_usrlfrassin_ddaT063_t147_t249_sauter_remapTrue.iterdb',\
 					'jet83324_usrlfrassin_ddaT003_t145_t247_hager_remapTrue.iterdb',\
@@ -51,11 +51,6 @@ profile_name =path+'DIIID162940.iterdb' 		#name of the profile file
 
 geomfile_name = 'g162940.02944_670'
 #geomfile_name = 'tracer_efit.dat'      #name of the magnetic geometry file
-profile_name ='DIIID162940.iterdb' 		#name of the profile file
-                                            #DIIID175823.iterdb
-                                            #p000000
-
-geomfile_name = 'g162940.02944_670'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 

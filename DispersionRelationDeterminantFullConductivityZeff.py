@@ -8,6 +8,7 @@ Created on Thu Nov 19 00:58:16 2020
 import numpy as np
 from matplotlib import pyplot as plt
 from max_parity_calculator import parity_finder_short
+import csv
 
 #The following code solves the electromagnetic slab model equations.
 #It has been developed to study that dispersion characteristics of micro-tearing modes a single branch or solution
@@ -19,14 +20,25 @@ from max_parity_calculator import parity_finder_short
 #Zeff: Z effective due to impurties: Zeff=1/n_e(n_i+Z^2n_z)
 # 
 
+
 def VectorFinder_auto(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
+    mu=abs(mu)
+    if mu<=2:
+        w0=VectorFinder_auto_tool(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar)
+    else:
+        w0=VectorFinder_auto_large_mu(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar)
+    return w0
+
+def VectorFinder_auto_tool(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
 
     judge=0
     loopindex=0
     xmax=20.
     delx=0.02
-    guess_mod=[0.,-1.,-0.5,0.5,1.]#modify the initial guess to( 1+eta+guess_mod[loopindex] )
+    guess_mod=[0.3,0.35,0.25,0.2,0.15,0.1]#modify the initial guess to( 1+eta+guess_mod[loopindex] )
 
+    mu=abs(mu)
+    
     w_list=[]
     odd_list=[]
     while judge == 0:
@@ -48,7 +60,7 @@ def VectorFinder_auto(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
         b=np.ones(2*num-2)
         
         w0=1.+eta
-        wguess=w0+guess_mod[loopindex]
+        wguess=w0+ Zeff*nu*0.1 + 1j*guess_mod[loopindex]
 
         
         w0=w_finder(xmax,delx,wguess,nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar,1)
@@ -68,15 +80,24 @@ def VectorFinder_auto(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
         parity1,location0,ratio=parity_finder_short(xgrid,Aparallel,name='apar',plot=0,report=0)
         print('[oddness,eveness]='+str(ratio))
 
+        #plt.clf()
+        #plt.plot(xgrid,np.real(Aparallel))
+        #plt.show()
+
+        with open('W_auto_log.csv', 'a') as csvfile:        #clear all and then write a row
+            data = csv.writer(csvfile, delimiter=',')
+            data.writerow([guess_mod[loopindex],w0,ratio[0],nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar])
+        csvfile.close()
+
         #SigmaPlotter(xmax, delx, w0, nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar)
         loopindex=loopindex+1
         w_list.append(w0)
         odd_list.append(ratio[0])
-        if ratio[0]>0.7 and np.imag(w0)>0:
+        if ratio[0]<0.3 and np.imag(w0)>0:
             judge=1
-        elif loopindex>=2 and np.std(np.array(w_list))<0.1:
-            print('std is'+str(np.std(np.array(w_list))))
-            judge=1
+        #elif loopindex>=2 and np.std(np.array(w_list))<0.02:
+        #    print('std is'+str(np.std(np.array(w_list))))
+        #    judge=1
         elif loopindex>=len(guess_mod):
             judge=1
         else:
@@ -86,7 +107,7 @@ def VectorFinder_auto(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
     odd_w0s=[]
     odd_w0_real=[]
     for i in range(len(w_list)):
-        if odd_list[i]>0.7:
+        if odd_list[i]<0.7:
             odd_w0s.append(w_list[i])
             odd_w0_real.append(w_list[i].imag)
     print(np.array(odd_w0_real))
@@ -98,6 +119,122 @@ def VectorFinder_auto(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
         w0=odd_w0s[w0_index]
         print('final w0='+str(w0))
         return w0
+    
+def VectorFinder_auto_tool_w0previous(w0_previous,nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
+
+    judge=0
+    loopindex=0
+    xmax=20.
+    delx=0.02
+    guess_mod=[0.3,0.35,0.25,0.2,0.15,0.1]#modify the initial guess to( 1+eta+guess_mod[loopindex] )
+
+    mu=abs(mu)
+    
+    w_list=[]
+    odd_list=[]
+    while judge == 0:
+       
+        print("Parameters:")
+        print("(0) nu="+str(nu))
+        print("(1) Zeff="+str(Zeff))
+        print("(2) eta="+str(eta))
+        print("(3) beta="+str(beta))
+        print("(4) ky="+str(ky))
+        print("(5) Modulation?="+str(ModIndex))
+        print("(6) mu="+str(mu))
+        print("(7) xstar="+str(xstar))
+        print("(8) shat="+str(shat))
+            
+         
+        xgrid=np.arange(-xmax,xmax,delx,complex)
+        num=len(xgrid)
+        b=np.ones(2*num-2)
+        
+        w0=1.+eta
+        wguess=w0_previous+ Zeff*nu*0.1 + 1j*guess_mod[loopindex]
+
+        
+        w0=w_finder(xmax,delx,wguess,nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar,1)
+        A = A_maker(xmax, delx, w0, nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar)
+        AInverse=np.linalg.inv(A)
+        change=1.
+        lold=2.
+        while change > 10.**(-13):
+            b=np.matmul(AInverse,b)
+            b=b/np.linalg.norm(b)
+            lnew=np.matmul(np.conj(b),np.matmul(A,b))
+            change=np.abs(lnew-lold)
+            lold=lnew
+        Aparallel=b[0:num]
+        ModG=np.abs(b[int(num/2)])*np.exp(-((xgrid-mu)/xstar)**2.)
+        
+        parity1,location0,ratio=parity_finder_short(xgrid,Aparallel,name='apar',plot=0,report=0)
+        print('[oddness,eveness]='+str(ratio))
+
+        #plt.clf()
+        #plt.plot(xgrid,np.real(Aparallel))
+        #plt.show()
+
+        with open('W_auto_log.csv', 'a') as csvfile:        #clear all and then write a row
+            data = csv.writer(csvfile, delimiter=',')
+            data.writerow([guess_mod[loopindex],w0,ratio[0],nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar])
+        csvfile.close()
+
+        #SigmaPlotter(xmax, delx, w0, nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar)
+        loopindex=loopindex+1
+        w_list.append(w0)
+        odd_list.append(ratio[0])
+        if ratio[0]<0.3 and np.imag(w0)>0:
+            judge=1
+        #elif loopindex>=2 and np.std(np.array(w_list))<0.02:
+        #    print('std is'+str(np.std(np.array(w_list))))
+        #    judge=1
+        elif loopindex>=len(guess_mod):
+            judge=1
+        else:
+            judge=0
+    print('w_list='+str(w_list))
+    print('odd_list='+str(odd_list))
+    odd_w0s=[]
+    odd_w0_real=[]
+    for i in range(len(w_list)):
+        if odd_list[i]<0.7:
+            odd_w0s.append(w_list[i])
+            odd_w0_real.append(w_list[i].imag)
+    print(np.array(odd_w0_real))
+    if len(odd_w0_real)==0:
+        print('There is no mode in this')
+        return 0.
+    else:
+        w0_index=np.argmax(np.array(odd_w0_real))
+        w0=odd_w0s[w0_index]
+        print('final w0='+str(w0))
+        return w0
+def VectorFinder_auto_large_mu(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
+    mu=abs(mu)
+    mu0=0.
+    delta_mu=0.5
+    loop_index=0
+    w0_temp=0
+    while(1==1):
+        if loop_index==1:
+            w0_temp=VectorFinder_auto_tool(nu,Zeff,eta,shat,beta,ky,ModIndex,mu0,xstar)
+            w0=w0_temp
+        else:
+            w0=VectorFinder_auto_tool_w0previous(w0_temp,nu,Zeff,eta,shat,beta,ky,ModIndex,mu0,xstar)
+        gamma=w0.imag
+        if mu0<mu:
+            mu0=mu0+delta_mu
+            if mu0>mu:
+                mu0=mu
+        else:#reach to the final mu
+            break
+
+        if gamma<0:#reach to the growth that is stable
+            break
+
+        loop_index=loop_index+1
+    return w0
 
 def Gaussian(sigma,mu,x_list):
 	return 1./(sigma * np.sqrt(2. * np.pi)) * np.exp( - (x_list - mu)**2. / (2. * sigma**2.) )
@@ -309,6 +446,7 @@ def w_finder(x_max, del_x, w_guess, v,Zeff,ne,alpha,beta,ky,ModIndex,mu,xstar,pr
 
     # iterative loop that runs until the correction to the root is very small
     # secant method??
+    neg_streak=0
     while np.abs(del_w) > 10**-8:
         A = A_maker(x_max, del_x, w0, v,Zeff,ne,alpha,beta,ky,ModIndex,mu,xstar)
         det_A0 = np.linalg.slogdet(A)
@@ -317,6 +455,14 @@ def w_finder(x_max, del_x, w_guess, v,Zeff,ne,alpha,beta,ky,ModIndex,mu,xstar,pr
         w_minus = w0
         w0 = w_plus
         det_A_minus = det_A0
+        if w0.imag<0:
+            neg_streak=neg_streak+1
+        else:
+            neg_streak=0
+
+        if neg_streak>=4:
+            break
+
         if printIndex==1:
             print(w0)
     return w0
@@ -676,14 +822,6 @@ def Dispersion(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
 
 
 #*******Testing line**************
-VectorFinder_auto(1.5,2.0,2.267679,0.006,0.002,0.05,1,0,6)
+#VectorFinder_auto(1.5,2.0,2.267679,0.006,0.002,0.05,1,0,6)
 #*******Testing line**************
 
-
-
-#Dispersion(4.,1.,0.05,0.005,0.05,1.,0.,5.)
-#ParameterScan()
-#Dispersion(0.75,2.35,2.25,0.006,0.0018,0.02,1,0.4,5.43)
-
-#VectorFinder(3.0,1.0,2.0,0.006,0.002,0.01,0,0,0)
-#ParameterScan()
