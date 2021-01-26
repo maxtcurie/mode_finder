@@ -23,31 +23,35 @@ def read_pfile(p_file_name,Z,add_impurity=False):
 
     print("p-file resolution: nr = "+str(nr) )
 
+    if (nr+1)*int(len(sdata)/(nr+1))!=sdata:
+        print('data need to be managed manually, please look into the code output carefully. ')
+
     name_list=[]
     
-    for i in range(int(len(sdata)/(nr+1))):   #scan all of the quantitites in the p file
+    #for i in range(int(len(sdata)/(nr+1))):   #scan all of the quantitites in the p file
         #print(sdata[i*nr+i].split()[2])
-        name_list.append(sdata[i*nr+i].split()[2])
+        #name_list.append(sdata[i*nr+i].split()[2])
 
     need_list=['ne','ni','te','ti','er','vtor']   #List of quantities that need for to be read
     need_list_number=[-1]*len(need_list)          #Number of the namelist that matches with the list of quantities that need for to be read
     
-    
-    for j in range(len(need_list)):
-        for i in range(len(name_list)):
-            #print(name_list[i])
-            if str(need_list[j]) in str(name_list[i]):
-                #print(str(need_list[j])+'   '+str(name_list[i]))
-                #print(str(i))
-                #need_list_number.append(i)
-                need_list_number[j]=i
+    print('All the quantities listed in the p file: ')
+    #print(name_list)
+    for i in range(len(need_list)):
+        for j in range(len(sdata)):
+            if len(sdata[j].split()) >= 3:
+                if str(need_list[i]) in str(sdata[j].split()[2]):
+                    need_list_number[i]=j
 
-    
     case=0
-    
+
+    print('list of quantities name needed')
+    print(need_list)
+    print('number coorepsonds to the name list, -1 means missing')
+    print(need_list_number)
     #if len(need_list) > len(need_list_number): 
     if -1 in need_list_number:
-        print('Error, missing needed quantities in q file, check line 31 need_list in read_qfile.py')
+        print('Error, missing needed quantities in p file, check line 31 need_list in read_qfile.py')
         if need_list_number[4]==-1:
             need_list_number[4]=0
             temp0=input("The array er is missing, force the array to zero, countiune: 1:Yes, 2.No         ")
@@ -84,7 +88,7 @@ def read_pfile(p_file_name,Z,add_impurity=False):
     for i in range(len(need_list_number)):
         n_temp=int(need_list_number[i])   #take the i_th data set
         for j in range(nr):
-            temp = sdata[n_temp*nr+j+n_temp+1].split()
+            temp = sdata[n_temp+j+1].split()
             psi.append(float(temp[0]))
             f.append(float(temp[1]))
             df.append(float(temp[2]))
@@ -226,7 +230,7 @@ def p_to_iterdb_format(p_file_name,geomfile_name):
     # uniform spacing because first_derivative requires so
     # find pressure, temperature, density values on uniform R grid
 
-    uni_R = np.linspace(EFITdict['R'][0],Rsep,EFITdict['nw']*10.)
+    uni_R = np.linspace(EFITdict['R'][0],Rsep,EFITdict['nw']*10)
     psip_uniR = interp(EFITdict['R'], EFITdict['psipn'], uni_R)
     rhot_uniR = interp(EFITdict['R'], EFITdict['rhotn'], uni_R)
 
@@ -245,7 +249,7 @@ def p_to_iterdb_format(p_file_name,geomfile_name):
     gradPeoverNe = first_derivative(pe_uniR,uni_R)/ne_uniR 
 
 
-    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10.)
+    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
     ti_u = interp(rhot0,ti0,uni_rhot)
     te_u = interp(rhot0,te0,uni_rhot)
     ne_u = interp(rhot0,ne0,uni_rhot)
