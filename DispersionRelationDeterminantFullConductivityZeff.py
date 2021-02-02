@@ -219,9 +219,14 @@ def VectorFinder_auto_large_mu(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
     while(1==1):
         if loop_index==1:
             w0_temp=VectorFinder_auto_tool(nu,Zeff,eta,shat,beta,ky,ModIndex,mu0,xstar)
+            if abs(w0_temp)<0.001:
+                w0_temp=1.+eta
             w0=w0_temp
         else:
             w0=VectorFinder_auto_tool_w0previous(w0_temp,nu,Zeff,eta,shat,beta,ky,ModIndex,mu0,xstar)
+            if abs(w0)<0.001:
+                w0=1.+eta
+            w0_temp=w0
         gamma=w0.imag
         if mu0<mu:
             mu0=mu0+delta_mu
@@ -231,6 +236,7 @@ def VectorFinder_auto_large_mu(nu,Zeff,eta,shat,beta,ky,ModIndex,mu,xstar):
             break
 
         if gamma<0:#reach to the growth that is stable
+            w0=-1j*100
             break
 
         loop_index=loop_index+1

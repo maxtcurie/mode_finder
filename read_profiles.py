@@ -51,8 +51,8 @@ def read_profile_file(profile_type,profile_name,geomfile_name,suffix):
         return rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0
 
     elif profile_type=="pfile":
-        rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = p_to_iterdb_format(profile_name,geomfile_name)
-        return rhot0, rhop0, te0, ti0, ne0, ni0, vrot0
+        rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = p_to_iterdb_format(profile_name,geomfile_name)
+        return rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0
 
     elif profile_type=="profile_e":
         if suffix=="dat":
@@ -94,7 +94,9 @@ def read_profile_file(profile_type,profile_name,geomfile_name,suffix):
         te0 = interp(x_a,T*1000.,rhot0)
         ti0=interp(rhot,ti,rhot0)
         ni0=interp(rhot,ni,rhot0)
+        nz0 = interp(rhot,nz,rhot0)
         ne0 = interp(x_a,n0*1.0e19,rhot0)
+
         vrot0=interp(rhot,vrot,rhot0)
         
         print("**************************")

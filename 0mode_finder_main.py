@@ -17,8 +17,8 @@ from read_EFIT_file import get_geom_pars
 #location for testing:/global/cscratch1/sd/maxcurie/DIIID_175823/global_scan/n0_20
 #**************Block for user*****************************************
 #**************Setting up*********************************************
-profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="GENE_tracor"         # "gfile"  "GENE_tracor"
+profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 profile_name_list=['jet82482_usrlfrassin_ddaT008_t157_t259_hager_remapTrue.iterdb',\
@@ -45,11 +45,11 @@ geomfile_name = geomfile_name_list[2]      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
-profile_name =path+'DIIID162940.iterdb' 		#name of the profile file
+profile_name ='p175823.04100_f7099' 		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 
-geomfile_name = 'g162940.02944_670'
+geomfile_name = 'g175823.04108_257x257'
 #geomfile_name = 'tracer_efit.dat'      #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
@@ -77,8 +77,8 @@ x0_center_pick=0.962
 #*************Loading the data******************************************
 if profile_type=="ITERDB":
     rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
-else:
-    rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+elif profile_type=="pfile":
+        rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
 
 
 if geomfile_type=="gfile": 

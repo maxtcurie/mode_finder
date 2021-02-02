@@ -39,22 +39,22 @@ from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 #**************Block for user******************************************
 #**************Setting up*********************************************
 
-profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="GENE_tracor"         # "gfile"  "GENE_tracor"
+profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
 #path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
 #path=''
-#profile_name = 'DIIID175823.iterdb'
+profile_name = 'p175823.04100_f7099' 
 #profile_name = path+'DIIID162940.iterdb'
-profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb'		#name of the profile file
+#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb'		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 #geomfile_name = 'g175823.04108_257x257'
-#geomfile_name = 'jet78697.51005_hager.eqdsk'
+geomfile_name = 'g175823.04108_257x257'
 #geomfile_name = 'tracer_efit.dat'
 
-geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'     #name of the magnetic geometry file
+#geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'     #name of the magnetic geometry file
                                             #g000000
                                             #tracer_efit.dat
 
@@ -68,8 +68,8 @@ ModIndex=1 					# 1 is taking global effect, 0 is only local effect
 omega_percent=10.                      #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
-n_min=1                                #minmum mode number (include) that finder will cover
-n_max=12                               #maximum mode number (include) that finder will cover
+n_min=10                                #minmum mode number (include) that finder will cover
+n_max=30                              #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
 plot_profile=False                     #Set to True is user want to have the plot of the profile
 plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
@@ -78,10 +78,10 @@ csv_n_scan=True                       #Set to True is user want to have the csv 
 plot_spectrogram=False
 peak_of_plasma_frame=False             #Set to True if one want to look around the peak of omega*e in plasam frame
 
-zeff=2.35	#Effective charges due impurity
+zeff_manual=False  #2.35	#Effective charges due impurity
 Z=6.		#charge of impurity
 manual_ped=0
-mid_ped0=0.958
+mid_ped0=0.97
 
 
 #******For scaning********
@@ -259,8 +259,8 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     mref = 2.        # mass of ion in proton mass
     if profile_type=="ITERDB":
         rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
-    else:
-        rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+    elif profile_type=="pfile":
+        rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
 
 
     if geomfile_type=="gfile": 
@@ -279,6 +279,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
         ti0=ti0[rhot0_range_min:rhot0_range_max]
         ne0=ne0[rhot0_range_min:rhot0_range_max]
         ni0=ni0[rhot0_range_min:rhot0_range_max]
+        nz0=nz0[rhot0_range_min:rhot0_range_max]
         vrot0=vrot0[rhot0_range_min:rhot0_range_max]
 
     uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
@@ -286,8 +287,8 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     te_u = interp(rhot0,te0,uni_rhot)
     ne_u = interp(rhot0,ne0,uni_rhot)
     ni_u = interp(rhot0,ni0,uni_rhot)
-    if profile_type=="ITERDB0":
-        nz_u = interp(rhot0,nz0,uni_rhot)
+    print(str((len(rhot0),len(nz0),len(uni_rhot))))
+    nz_u = interp(rhot0,nz0,uni_rhot)
     vrot_u = interp(rhot0,vrot0,uni_rhot)
     q      = interp(xgrid,q,uni_rhot)
     tprime_e = -fd_d1_o4(te_u,uni_rhot)/te_u
@@ -320,8 +321,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     te_u = te_u[index_begin:len(uni_rhot)-1]
     ne_u = ne_u[index_begin:len(uni_rhot)-1]
     ni_u = ni_u[index_begin:len(uni_rhot)-1]
-    if profile_type=="ITERDB0":
-        nz_u = nz_u[index_begin:len(uni_rhot)-1]
+    nz_u = nz_u[index_begin:len(uni_rhot)-1]
     vrot_u = vrot_u[index_begin:len(uni_rhot)-1]
     q      = q[index_begin:len(uni_rhot)-1]
     tprime_e = tprime_e[index_begin:len(uni_rhot)-1]
@@ -339,8 +339,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
 
     ne=ne_u/(10.**19.)      # in 10^19 /m^3
     ni=ni_u/(10.**19.)      # in 10^19 /m^3
-    if profile_type=="ITERDB0":
-        nz=nz_u/(10.**19.)      # in 10^19 /m^3
+    nz=nz_u/(10.**19.)      # in 10^19 /m^3
     te=te_u/1000.          #in keV
     m_SI = mref *1.6726*10**(-27)
     me_SI = 9.11*10**(-31)
@@ -369,6 +368,15 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     omegaDoppler = abs(vrot_u*n0/(2.*np.pi*1000.))
     omega=mtmFreq + omegaDoppler
 
+    global zeff
+    zeff = ( (ni+Z**2*nz)/ne )[center_index]
+
+    if zeff_manual!=False:
+        zeff=zeff_manual
+    print('********zeff*********')
+    print('zeff='+str(zeff))
+    print('********zeff*********')
+
     omega_n_GENE=kyGENE*(nprime_e)       #in cs/a
     print("*******************")
     print("*******************")
@@ -376,9 +384,6 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     print("*******************")
     print("*******************")
     omega_n=omega_n_GENE*gyroFreq/(2.*np.pi*1000.)  #in kHz
-
-    if profile_type=="ITERDB0":
-        Zeff=(ni+nz*Z**2.)*(1./ne)
 
     #coll_ei=coll_ei/(1000.)  #in kHz
     coll_ei=coll_ei/(2.*np.pi*1000.)  #in kHz
@@ -391,19 +396,18 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     ky=kyGENE*np.sqrt(2.)
     nu=(coll_ei)/(np.max(omega_n))
 
+
+
     nuei=nu*omega_n_GENE/omega_n
 
-    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
     
-    if abs(mean_rho) + abs(xstar)<0.0001:
-        quit() 
 
     if plot==True:
         if profile_type=="ITERDB0":
             plt.clf()
             plt.plot(uni_rhot,nuei,label='nuei(cs/a)')
             plt.plot(uni_rhot,nuei*2.*np.pi,label='nuei(cs/a)*2 pi')
-            plt.plot(uni_rhot,nuei*Zeff,label='nuei*zeff')
+            plt.plot(uni_rhot,nuei*zeff,label='nuei*zeff')
             plt.legend()
             plt.title('nuei')
             plt.axvline(0.96,color='red',alpha=1.)
@@ -481,7 +485,11 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
         plt.plot(uni_rhot,ky,label='ky')
         plt.show()
 
+    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
     
+    if abs(mean_rho) + abs(xstar)<0.0001:
+        quit() 
+
     if output_csv==True:
         with open('profile_output.csv','w') as csvfile:
             data = csv.writer(csvfile, delimiter=',')
@@ -642,7 +650,7 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
         
         
     if output_csv==True:
-        with open('MTM_dispersion_n_scan.csv','w') as csvfile:
+        with open('MTM_dispersion_n_scan'+profile_name+'.csv','w') as csvfile:
             data = csv.writer(csvfile, delimiter=',')
             data.writerow([   'x/a',     'n',      'm',      'gamma(kHz)',      'gamma(cs/a)',    'nu_ei(kHz)','omega*/omega*_max' ,'omega_plasma(kHz)','omega_lab(kHz)',   'omega_star_plasma(kHz)','omega_star_lab(kHz)','nu', 'eta', 'shat', 'beta', 'ky', 'mu', 'xstar'])
             csvfile.close()
@@ -681,9 +689,9 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             omega_n_temp=omega_n_top[x_index]*factor_temp
             gamma_kHz=gamma*omega_n_temp
             omega_kHz=omega*omega_n_temp
-            omega_Lab_kHz=omega_kHz-omegaDoppler_top[x_index]*factor_temp
+            omega_Lab_kHz=abs(omega_kHz)+abs(omegaDoppler_top[x_index]*factor_temp)
             omega_star_kHz=mtmFreq_top[x_index]*factor_temp
-            omega_star_Lab_kHz=mtmFreq_top[x_index]*factor_temp+omegaDoppler_top[x_index]*factor_temp
+            omega_star_Lab_kHz=mtmFreq_top[x_index]*factor_temp+abs(omegaDoppler_top[x_index]*factor_temp)
             nu_ei_kHz=( nu_top[x_index] * omega_n_top[x_index] )
             #nu_ei/omega*e in plasma frame
 
@@ -711,7 +719,7 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             xstar_list.append(xstar)
 
             if output_csv==True:
-                with open('MTM_dispersion_n_scan.csv','a+') as csvfile:
+                with open('MTM_dispersion_n_scan'+profile_name+'.csv','a+') as csvfile:
                     data = csv.writer(csvfile, delimiter=',')
                     data.writerow([x_list[-1],n_list[-1],m_list[-1],gamma_list_kHz[-1],gamma_list_kHz[-1]*kHz_to_cs_a_list[-1],nu_ei_kHz_list[-1],omega_omega_peak_list[-1],omega_list_kHz[-1],omega_list_Lab_kHz[-1],omega_star_list_kHz[-1],omega_star_list_Lab_kHz[-1],nu_list[-1], eta_list[-1], shat_list[-1], beta_list[-1], ky_list[-1], mu_list[-1], xstar_list[-1]])
                     csvfile.close()
