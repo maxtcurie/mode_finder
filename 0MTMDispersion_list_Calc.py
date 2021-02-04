@@ -7,23 +7,9 @@ Created on 01/28/2021
 
 import pandas as pd
 import numpy as np
-#from mpi4py import MPI
-
-from MPI_tools import task_dis
 from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 
 csvfile_name='Scan_list_template.csv'
-
-data_set=[]
-
-'''
-comm=MPI.COMM_WORLD
-rank=comm.Get_rank()
-size=comm.Get_size()
-
-print("size:"+str(size))
-print("rank:"+str(rank))
-'''
 
 def Dispersion_calc(path,filename):
     
@@ -41,21 +27,16 @@ def Dispersion_calc(path,filename):
     mu=data['mu']
     xstar=data['xstar'][0]
     ModIndex=1
-    task_list=[]
+
     for i in range(nx):
-        print(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar)
-        gamma_complex.append(1)
+        #print(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar)
+        #gamma_complex.append(1)
         #********This is the part that needs to be paraelled ****************
-        task_list.append([nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar])
-        #gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
-        #gamma_complex.append(gamma_complex_temp)
+        gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
+        gamma_complex.append(gamma_complex_temp)
         #********This is the part that needs to be paraelled *****************
-
-    size=6
-    task_dis_list=task_dis(size,task_list)
-    for i in range(size):
-        task_dis_list[i]
-
+        
+    
     gamma_complex=np.asarray(gamma_complex)
     #factor=np.asarray(factor)
     gamma=gamma_complex.imag
@@ -66,7 +47,7 @@ def Dispersion_calc(path,filename):
     data['omega_plasma(kHz)']=omega*data['omn(kHz)']
     data['omega_lab(kHz)']=data['omega_plasma(kHz)']+data['omega_star_lab(kHz)']-data['omega_star_plasma(kHz)']
 
-    data.to_csv(path+'/0_MPI_calc_'+filename,index=False)
+    data.to_csv(path+'/0_calc_'+filename,index=False)
 
     return gamma,omega
 
