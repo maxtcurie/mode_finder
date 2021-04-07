@@ -12,7 +12,7 @@ import numpy as np
 from MPI_tools import task_dis
 from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 
-csvfile_name='Scan_list_template.csv'
+csvfile_name='./Scan_list_template.csv'
 
 data_set=[]
 
@@ -43,11 +43,13 @@ def Dispersion_calc(path,filename):
     ModIndex=1
     task_list=[]
     for i in range(nx):
+        print('*******nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar********')
         print(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar)
+        print('***************')
         gamma_complex.append(1)
         #********This is the part that needs to be paraelled ****************
         task_list.append([nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar])
-        #gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
+        gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
         #gamma_complex.append(gamma_complex_temp)
         #********This is the part that needs to be paraelled *****************
 
@@ -61,10 +63,10 @@ def Dispersion_calc(path,filename):
     gamma=gamma_complex.imag
     omega=gamma_complex.real
 
-    data['gamma(kHz)']=gamma*data['omn(kHz)']
-    data['gamma(cs/a)']=data['gamma(kHz)']*data['kHz_to_cs_a']
-    data['omega_plasma(kHz)']=omega*data['omn(kHz)']
-    data['omega_lab(kHz)']=data['omega_plasma(kHz)']+data['omega_star_lab(kHz)']-data['omega_star_plasma(kHz)']
+    #data['gamma(kHz)']=gamma*data['omn(kHz)']
+    #data['gamma(cs/a)']=data['gamma(kHz)']*data['kHz_to_cs_a']
+    #data['omega_plasma(kHz)']=omega*data['omn(kHz)']
+    #data['omega_lab(kHz)']=data['omega_plasma(kHz)']+data['omega_star_lab(kHz)']-data['omega_star_plasma(kHz)']
 
     data.to_csv(path+'/0_MPI_calc_'+filename,index=False)
 
