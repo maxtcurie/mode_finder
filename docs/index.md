@@ -49,21 +49,63 @@ One can find the user block in the code in MTMDisperion.py
 
 
 ```markdown
-Syntax highlighted code block
+#**************Block for user******************************************
+#**************Setting up*********************************************
 
-# Header 1
-## Header 2
-### Header 3
+profile_type="ITERDB"          # "ITERDB" "pfile", "profile_e", "profile_both" 
+geomfile_type="gfile"         # "gfile"  "GENE_tracor"
 
-- Bulleted
-- List
+#path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
+path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+#path=''
+profile_name = 'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb' 
+#profile_name = path+'DIIID162940.iterdb'
+#profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb'		#name of the profile file
+                                            #DIIID175823.iterdb
+                                            #p000000
+#geomfile_name = 'g175823.04108_257x257'
+geomfile_name = 'jet78697.51005_hager.eqdsk'
+#geomfile_name = 'tracer_efit.dat'
 
-1. Numbered
-2. List
+#geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'     #name of the magnetic geometry file
+                                            #g000000
+                                            #tracer_efit.dat
 
-**Bold** and _Italic_ and `Code` text
+suffix='dat'            	    #The suffix if one choose to use GENE_tracor for q profile
+                                #0001, 1, dat
 
-[Link](url) and ![Image](src)
+run_mode_finder=True        #Change to True if one want to run mode finder 
+run_nu_scan=False           #Change to True if one want to run collisionality scan 
+ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
+
+omega_percent=10.                      #choose the omega within the top that percent defined in(0,100)
+#q_scale=1.015
+q_scale=1. #0.949 #0.955
+n_min=10                                #minmum mode number (include) that finder will cover
+n_max=30                              #maximum mode number (include) that finder will cover
+bins=800                               #sizes of bins to smooth the function
+plot_profile=True                     #Set to True is user want to have the plot of the profile
+plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
+csv_profile=False                    #Set to True is user want to have the csv file "profile_output.csv" of the profile
+csv_n_scan=True                       #Set to True is user want to have the csv file "MTM_dispersion_n_scan.csv" of the gamma over n
+plot_spectrogram=False
+peak_of_plasma_frame=False             #Set to True if one want to look around the peak of omega*e in plasam frame
+
+zeff_manual=False  #2.35	#Effective charges due impurity
+Z=6.		#charge of impurity
+manual_ped=0
+mid_ped0=0.97
+
+
+#******For scaning********
+scan_n0=3.
+choose_location=False    #Change to True if one wants to change the location manually 
+location=0.984139203080616
+plot_peak_scan=True
+csv_peak_scan=True
+nu_percent=10  #about the nu0 for x% 1=100%
+#**************End of Setting up*********************************************
+#**************End of Block for user******************************************
 ```
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
