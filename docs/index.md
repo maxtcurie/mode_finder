@@ -1,6 +1,6 @@
 ## Welcome to Mode finder GitHub page
 
-**IMPORTANT** The mode finder package is the freely avavible for everyone. It will be appricated if one can **cite** the paper and presentation that is to this project. 
+**IMPORTANT** The mode finder package is the freely avavible for everyone. It will be appricated if one can **cite** the papers and presentations that are related to this project. 
 
 ```markdown
 ** Larakers, J.,Curie, M.T., Hatch, D. R., Hazeltine, R., & Mahajan, S. M. (2021). Tearing modes in thetokamak pedestal.Physics Review Letters(In review)**
@@ -23,7 +23,19 @@ title = {Tearing modes in the tokamak pedestal},
  url = {https://doi.org/10.1063/5.0006215}
 }
 
- ![Image](src)
+#Curie, M.T., Halfmoon, M., Larakers, J., Hassan, E., Chen, J., Brower, D., Hatch, D.,Kotschenreuther, M., Mahajan, S., DIII-D team, & JET team. (2020). Exploring reduced predictivemodels for magnetic fluctuations, APS DPP.
+
+@INPROCEEDINGS{APS2020,
+author={\textbf{Curie, M.T.} and M.R. Halfmoon and Joel Larakers and Ehab Hassan and J. Chen and D.L. Brower and D.R. Hatch and M.T. Kotschenreuther and S.M. Mahajan and {DIII-D team} and {JET team}},
+year={2020},
+title={Exploring reduced predictive models for magnetic fluctuations},
+ address = {APS DPP},
+ timestamp = {2020.11.05},
+keyword={meeting}
+}
+
+
+#
 ```
 
 
