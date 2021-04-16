@@ -28,9 +28,9 @@ title = {Tearing modes in the tokamak pedestal},
 
 
 The mode finder has a few options for the running the scripts: 
-1. 0mode_finder_main.py:   running the mode finder only by alignment of rational surfaces and peak of $\omega_*e$ along
-2. 0MTMDispersion.py:      running the mode finder with the disperison calculatin
-3. 0MTMDispersion_MPI.py:  running the mode finder with the disperison calculatin that is MPI enabled 
+1. **0mode_finder_main.py**:   running the mode finder only by alignment of rational surfaces and peak of $\omega_*e$ along
+2. **0MTMDispersion.py**:      running the mode finder with the disperison calculatin
+3. **0MTMDispersion_MPI.py**:  running the mode finder with the disperison calculatin that is MPI enabled 
 
 One can find the user block in the code in MTMDisperion.py
 
