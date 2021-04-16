@@ -3,28 +3,27 @@
 **Important** The mode finder package is the free avavible for everyone. It will be appricated if one can cite the paper and presentation that is to this project. 
 
 ```markdown
-# Larakers, J.,Curie, M.T., Hatch, D. R., Hazeltine, R., & Mahajan, S. M. (2021). Tearing modes in thetokamak pedestal.Physics Review Letters(In review)
+** Larakers, J.,Curie, M.T., Hatch, D. R., Hazeltine, R., & Mahajan, S. M. (2021). Tearing modes in thetokamak pedestal.Physics Review Letters(In review)**
 
-@article{Joel_prl,
+@article{Larakers_prl,
 title = {Tearing modes in the tokamak pedestal},
  author = {J.L. Larakers and Curie, M.T. and D. R. Hatch and R.D. Hazeltine and S. M. Mahajan},
  year = {2021},
  journal = {Physics Review Letters(In review)}
 }
 
-# Header 1
-## Header 2
-### Header 3
+** Larakers, J., D. R., Hazeltine, R., & Mahajan, S. M. (2020). A comprehensive conductivity model for drift and micro-tearing modes [Link](https://doi.org/10.1063/5.0006215)**
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+@article{Larakers_pop,
+title = {Tearing modes in the tokamak pedestal},
+ author = {J.L. Larakers and R.D. Hazeltine and S. M. Mahajan},
+ year = {2020},
+ journal = {Physics of Plasmas},
+ url = {https://doi.org/10.1063/5.0006215}
+}
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+ ![Image](src)
 ```
 
 
