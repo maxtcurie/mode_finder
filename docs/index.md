@@ -1,12 +1,37 @@
 ## Welcome to Mode finder GitHub page
 
-#You can use the [editor on GitHub](https://github.com/maxcurie1996/mode_finder/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+**Important** The mode finder package is the free avavible for everyone. It will be appricated if one can cite the paper and presentation that is to this project. 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+```markdown
+# Larakers, J.,Curie, M.T., Hatch, D. R., Hazeltine, R., & Mahajan, S. M. (2021). Tearing modes in thetokamak pedestal.Physics Review Letters(In review)
 
-### Markdown
+@article{Joel_prl,
+title = {Tearing modes in the tokamak pedestal},
+ author = {J.L. Larakers and Curie, M.T. and D. R. Hatch and R.D. Hazeltine and S. M. Mahajan},
+ year = {2021},
+ journal = {Physics Review Letters(In review)}
+}
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+# Header 1
+## Header 2
+### Header 3
+
+- Bulleted
+- List
+
+1. Numbered
+2. List
+
+**Bold** and _Italic_ and `Code` text
+
+[Link](url) and ![Image](src)
+```
+
+
+The Mode fin
+
+One can find the user block in the code in MTMDisperion.py
+
 
 ```markdown
 Syntax highlighted code block
