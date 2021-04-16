@@ -1,6 +1,6 @@
 ## Welcome to Mode finder GitHub page
 
-**Important** The mode finder package is the free avavible for everyone. It will be appricated if one can cite the paper and presentation that is to this project. 
+**IMPORTANT** The mode finder package is the freely avavible for everyone. It will be appricated if one can **cite** the paper and presentation that is to this project. 
 
 ```markdown
 ** Larakers, J.,Curie, M.T., Hatch, D. R., Hazeltine, R., & Mahajan, S. M. (2021). Tearing modes in thetokamak pedestal.Physics Review Letters(In review)**
@@ -27,7 +27,10 @@ title = {Tearing modes in the tokamak pedestal},
 ```
 
 
-The Mode fin
+The mode finder has a few options for the running the scripts: 
+1. 0mode_finder_main.py:   running the mode finder only by alignment of rational surfaces and peak of $\omega_*e$ along
+2. 0MTMDispersion.py:      running the mode finder with the disperison calculatin
+3. 0MTMDispersion_MPI.py:  running the mode finder with the disperison calculatin that is MPI enabled 
 
 One can find the user block in the code in MTMDisperion.py
 
