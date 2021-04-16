@@ -12,7 +12,7 @@ title = {Tearing modes in the tokamak pedestal},
  journal = {Physics Review Letters(In review)}
 }
 
-** Larakers, J., D. R., Hazeltine, R., & Mahajan, S. M. (2020). A comprehensive conductivity model for drift and micro-tearing modes [Link](https://doi.org/10.1063/5.0006215)**
+** Larakers, J., D. R., Hazeltine, R., & Mahajan, S. M. (2020). A comprehensive conductivity model for drift and micro-tearing modes [https://doi.org/10.1063/5.0006215](url)**
 
 
 @article{Larakers_pop,
