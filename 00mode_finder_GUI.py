@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 11/27/2020
+Created on 06/19/2021
 
-@author: maxcurie, jlara
+@author: maxcurie
 """
 import numpy as np
 import pandas as pd
