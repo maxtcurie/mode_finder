@@ -40,7 +40,7 @@ from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 #**************Setting up*********************************************
 
 profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both" 
-geomfile_type="gfile"         # "gfile"  "GENE_tracor"
+geomfile_type="gfile"         # "gfile"  "GENE_tracer"
 
 #path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
 path='/global/u1/m/maxcurie/max/Cases/jet78697/'
@@ -58,7 +58,7 @@ geomfile_name = 'g175823.04108_257x257'
                                             #g000000
                                             #tracer_efit.dat
 
-suffix='dat'            	    #The suffix if one choose to use GENE_tracor for q profile
+suffix='dat'            	    #The suffix if one choose to use GENE_tracer for q profile
                                 #0001, 1, dat
 
 run_mode_finder=True        #Change to True if one want to run mode finder 
@@ -265,12 +265,12 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
 
     if geomfile_type=="gfile": 
         xgrid, q, R_ref= read_geom_file(geomfile_type,geomfile_name,suffix)
-    elif geomfile_type=="GENE_tracor":
+    elif geomfile_type=="GENE_tracer":
         xgrid, q, Lref, R_ref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
 
     q=q*q_scale
 
-    if geomfile_type=="GENE_tracor" and profile_type!="profile":
+    if geomfile_type=="GENE_tracer" and profile_type!="profile":
         rhot0_range_min=np.argmin(abs(rhot0-xgrid[0]))
         rhot0_range_max=np.argmin(abs(rhot0-xgrid[-1]))
         rhot0=rhot0[rhot0_range_min:rhot0_range_max]
@@ -303,7 +303,7 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     else:
         if geomfile_type=="gfile": 
             midped, topped=find_pedestal(file_name=geomfile_name, path_name='', plot=False)
-        elif geomfile_type=="GENE_tracor":
+        elif geomfile_type=="GENE_tracer":
             midped=x0_from_para
         x0_center = midped
 
