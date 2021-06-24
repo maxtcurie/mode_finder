@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 """
 Created on 06/19/2021
+Updated on 06/23/2021
 
 @author: maxcurie
 """
 import tkinter as tk
 from tkinter import filedialog 
+import numpy as np
 
-
-#global varible
-global geomfile_name
-geomfile_name=''
-
-global profile_name
-profile_name=''
-
-global Run_mode
-Run_mode=1
-
+from MTMDispersion_tools import Parameter_reader
+from MTMDispersion_tools import omega_gaussian_fit
 
 root=tk.Tk()
 root.title('Mode finder')
 root.iconbitmap('./Physics_helper_logo.ico')
+
+#global varible
+global geomfile_name
+geomfile_name=''
+global profile_name
+profile_name=''
+global Run_mode
+Run_mode=1
+
 
 #*************Input file*****************
 Input_frame=tk.LabelFrame(root, text='Input files',padx=5,pady=5)
@@ -102,7 +104,7 @@ def g_Click():
 									title='select a file', \
 									filetypes=( 
 										('all files', '*'),
-										('gfile','g*')\
+										('gfile/efit','g*')\
 										) \
 									)
 	global geomfile_name_box
@@ -177,34 +179,56 @@ option_button13.grid(row=3,column=0)
 
 
 
-#*******************Show all the setting********************
+#*******************Show all the setting and load the data********************
 omega_percent=float(omega_percent_inputbox.get())
 profile_type=profile_type_var.get()
 geomfile_type=geomfile_type_var.get()
 
-def print_setting():
-	return 0
+q_scale=1.
+manual_ped=-1
+manual_zeff=-1
+Z=6.
+suffix='.dat'
+
+def Load_data(profile_name,geomfile_name,\
+			q_scale,manual_ped,manual_zeff):
+	
+	profile_type=profile_type_var.get()
+	geomfile_type=geomfile_type_var.get()
+
+	print('omega_percent='+str(omega_percent)+'%')
+	print('Run_mode='+str(Run_mode))
+	print('geomfile_name='+str(geomfile_name))
+	print('profile_name ='+str(profile_name))
+	print('geomfile_type='+str(geomfile_type))
+	print('profile_type ='+str(profile_type))
 
 
+	uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,\
+		omegaDoppler,omega_n,omega_n_GENE,\
+		xstar,Lref, R_ref, rhoref=\
+			Parameter_reader(profile_type,profile_name,\
+                geomfile_type,geomfile_name,\
+                q_scale,manual_ped,manual_zeff,suffix,Z=6.,\
+                plot=False,output_csv=True)
 
-Print_Setting_Button=tk.Button(root, text='Show the setting',\
-					command=print_setting,\
+
+Print_Setting_Button=tk.Button(root, text='Load the data',\
+					command=lambda: Load_data(profile_name,geomfile_name,\
+									q_scale,manual_ped,manual_zeff),\
 					padx=50, pady=10)
 
 Print_Setting_Button.grid(row=3,column=0)
 
 
-#*******************Show all the setting********************
+#*******************Show all the setting and load the data********************
+
 #creat the GUI
 root.mainloop()
 
-profile_type=profile_type_var.get()
-geomfile_type=geomfile_type_var.get()
 
-print('omega_percent='+str(omega_percent)+'%')
-print('Run_mode='+str(Run_mode))
-#print('geomfile_type='+str(geomfile_name_box.get()))
-print('geomfile_name='+str(geomfile_name))
-print('profile_name ='+str(profile_name))
-print('geomfile_type='+str(geomfile_type))
-print('profile_type ='+str(profile_type))
+
+
+
+
+    

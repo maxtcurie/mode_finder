@@ -13,6 +13,11 @@ import math
 import csv
 from scipy import optimize
 
+#For GUI
+import tkinter as tk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+NavigationToolbar2Tk)
 
 from max_pedestal_finder import find_pedestal
 from max_pedestal_finder import find_pedestal_from_data
@@ -21,7 +26,7 @@ from read_profiles import read_geom_file
 from read_EFIT_file import get_geom_pars
 from max_stat_tool import *
 #from DispersionRelationDeterminant import Dispersion
-from DispersionRelationDeterminantFullConductivity import Dispersion
+from DispersionRelationDeterminantFullConductivityZeff import Dispersion
 
 #The following function computes the growth rate of the slab MTM. The input are the physical parameters and it outputs the growth rate in units of omega_{*n}
 #Parameters for function:
@@ -39,6 +44,7 @@ from DispersionRelationDeterminantFullConductivity import Dispersion
 def gaussian(x, amplitude, mean, stddev):
     return amplitude * np.exp(-((x - mean) / stddev)**2)
 
+
 def gaussian_fit(x,data):
     x,data=np.array(x), np.array(data)
 
@@ -47,8 +53,8 @@ def gaussian_fit(x,data):
 
     try:
         popt, pcov = optimize.curve_fit(gaussian, x,data)  
-
         max_index=np.argmax(data)
+        
         
         plt.clf()
         plt.plot(x,data, label="data")
@@ -120,9 +126,210 @@ def gaussian_fit(x,data):
 
     return amplitude,mean,stddev
 
+def gaussian_fit_GUI(x,data):
+    x,data=np.array(x), np.array(data)
+
+    global amplitude
+    global mean
+    global stddev
+
+
+    root=tk.Toplevel()
+    root.title('Gaussian Fit')
+    #root.geometry("500x500")
+    
+    #load the icon for the GUI 
+    root.iconbitmap('./Physics_helper_logo.ico')
+
+    #warnings.simplefilter("error", OptimizeWarning)
+    judge=0
+
+    frame_plot=tk.LabelFrame(root, text='Plot of the data and fitting',padx=20,pady=20)
+    frame_plot.grid(row=0,column=0)
+    fig = Figure(figsize = (5, 5),
+                dpi = 100)
+    plot1 = fig.add_subplot(111)
+    plot1.plot(x,data, label="data")
+
+    try:
+        popt, pcov = optimize.curve_fit(gaussian, x,data)  
+        max_index=np.argmax(data)
+
+        amplitude=popt[0]
+        mean=popt[1]
+        stddev=popt[2]
+
+        plot1.plot(x, gaussian(x, *popt), label="fit")
+        plot1.axvline(mean,color='red',alpha=0.5)
+        plot1.axvline(mean+stddev,color='red',alpha=0.5)
+        plot1.axvline(mean-stddev,color='red',alpha=0.5)
+        plot1.legend()
+
+    except RuntimeError:
+        print("Curve fit failed, need to fit manually")
+        pass  
+
+    canvas = FigureCanvasTkAgg(fig,master = frame_plot)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+    toolbar = NavigationToolbar2Tk(canvas,frame_plot)
+    toolbar.update()
+    canvas.get_tk_widget().pack()
+
+    root1=tk.LabelFrame(root, text='User Box',padx=20,pady=20)
+    root1.grid(row=0,column=1)
+
+
+    frame1=tk.LabelFrame(root1, text='Accept/Reject the fit',padx=20,pady=20)
+    frame1.grid(row=0,column=0)
+    #import an option button
+    opt_var1= tk.IntVar() #Integar Varible, Other options: StringVar()
+
+    option_button11=tk.Radiobutton(frame1, text='Accept the fit',\
+                                variable=opt_var1, value=1,\
+                                command=lambda: click_button(opt_var1.get(), root,root1))
+    option_button11.grid(row=1,column=0)
+
+    option_button12=tk.Radiobutton(frame1, text='Enter manually',\
+                                variable=opt_var1, value=2,\
+                                command=lambda: click_button(opt_var1.get(), root,root1))
+    option_button12.grid(row=2,column=0)
+        
+
+    
+
+    def click_button(value, root, root1):
+
+        global amplitude
+        global mean
+        global stddev 
+
+        label_list=[]
+
+        frame_data=tk.LabelFrame(root1, text='Current fitting parameter',padx=80,pady=20)
+        frame_data.grid(row=1,column=0)
+        label_list.append(frame_data)
+
+        amplitude_string=f'amplitude = {amplitude}'
+        mean_string     =f'mean      = {mean}'
+        std_string      =f'stddev    = {stddev}'
+        amplitude_string=amplitude_string+' '*(50-len(amplitude_string))
+        mean_string=mean_string+' '*(50-len(mean_string))
+        std_string=std_string+' '*(50-len(std_string))
+
+        amp_label =tk.Label(frame_data,text=amplitude_string)
+        mean_label=tk.Label(frame_data,text=mean_string)
+        std_label =tk.Label(frame_data,text=std_string)
+        amp_label.grid(row=0,column=0)
+        mean_label.grid(row=1,column=0)
+        std_label.grid(row=2,column=0)
+        label_list.append(amp_label)
+        label_list.append(mean_label)
+        label_list.append(std_label)
+
+        def plot_manual_fit(x,data,mean_Input,sigma_Input,root,label_list):
+            #frame_plot.grid_forget()
+
+            frame_plot=tk.LabelFrame(root, text='Plot of the data and fitting',padx=20,pady=20)
+            frame_plot.grid(row=0,column=0)
+            fig = Figure(figsize = (5, 5),
+                        dpi = 100)
+            plot1 = fig.add_subplot(111)
+            plot1.plot(x,data, label="data")
+            
+            global amplitude
+            global mean
+            global stddev 
+
+            mean=float(mean_Input)
+            amplitude=data[np.argmin(abs(x-mean))]
+            stddev=float(sigma_Input)
+
+
+            frame_data=label_list[0]
+            amp_label=label_list[1]
+            mean_label=label_list[2]
+            std_label=label_list[3]
+
+            amp_label.grid_forget()
+            mean_label.grid_forget()
+            std_label.grid_forget()
+
+            amplitude_string=f'amplitude = {amplitude}'
+            mean_string     =f'mean      = {mean}'
+            std_string      =f'stddev    = {stddev}'
+
+            amplitude_string=amplitude_string+' '*(50-len(amplitude_string))
+            mean_string=mean_string+' '*(50-len(mean_string))
+            std_string=std_string+' '*(50-len(std_string))
+
+
+            amp_label =tk.Label(frame_data,text=amplitude_string)
+            mean_label=tk.Label(frame_data,text=mean_string)
+            std_label =tk.Label(frame_data,text=std_string)
+            amp_label.grid(row=0,column=0)
+            mean_label.grid(row=1,column=0)
+            std_label.grid(row=2,column=0)
+
+            plot1.plot(x, gaussian(x, amplitude, mean, stddev), label="fit")
+            plot1.axvline(mean,color='red',alpha=0.5)
+            plot1.axvline(mean+stddev,color='red',alpha=0.5)
+            plot1.axvline(mean-stddev,color='red',alpha=0.5)
+            plot1.legend()
+        
+            canvas = FigureCanvasTkAgg(fig,master = frame_plot)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+            toolbar = NavigationToolbar2Tk(canvas,frame_plot)
+            toolbar.update()
+            canvas.get_tk_widget().pack()
+
+        if value==1:
+            #'Accept the fit'
+            myButton2=tk.Button(root1, text='Save and Continue', command=lambda :root.destroy())
+            myButton2.grid(row=3,column=0)
+
+        elif value==2:
+            #Label1.grid_forget()
+            #'Enter manually'
+            frame_input=tk.LabelFrame(root1, text='Manual Input',padx=10,pady=10)
+            frame_input.grid(row=2,column=0)
+            tk.Label(frame_input,text='mu(center) = ').grid(row=0,column=0)
+            mean_Input_box=tk.Entry(frame_input, width=30, bg='green', fg='white')
+            mean_Input_box.insert(0,'')
+            mean_Input_box.grid(row=0,column=1)
+        
+            tk.Label(frame_input,text='sigma(spread) = ').grid(row=1,column=0)
+            sigma_Input_box=tk.Entry(frame_input, width=30, bg='green', fg='white')
+            sigma_Input_box.insert(0,'')
+            sigma_Input_box.grid(row=1,column=1)
+
+            
+
+            Plot_Button=tk.Button(frame_input, text='Plot the Manual Fit',\
+                command=lambda: plot_manual_fit(x,data,\
+                    float( mean_Input_box.get()  ),\
+                    float( sigma_Input_box.get() ),\
+                    root,label_list\
+                    )  \
+                )
+            Plot_Button.grid(row=2,column=1)
+
+            Save_Button=tk.Button(root1, text='Save and Continue',\
+                     state=tk.DISABLED)#state: tk.DISABLED, or tk.NORMAL
+            Save_Button.grid(row=3,column=0)
+
+    #creat the GUI
+    root.mainloop()
+
+    stddev=abs(stddev)
+
+    return amplitude,mean,stddev
+
+
 
 def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
-    amplitude,mean,stddev=gaussian_fit(x,data)
+    amplitude,mean,stddev=gaussian_fit_GUI(x,data)
 
     mean_rho=mean*Lref/rhoref         #normalized to rhoi
     xstar=abs(stddev*Lref/rhoref)
@@ -147,19 +354,27 @@ def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
  
 
 #return nu,ky for the case n_tor=1 for the given location(default to be pedestal)
-def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_scale,manual_ped,mid_ped0,plot,output_csv,suffix='dat'):
+def Parameter_reader(profile_type,profile_name,\
+                geomfile_type,geomfile_name,\
+                q_scale,manual_ped,manual_zeff,suffix,Z=6.,\
+                plot=False,output_csv=True):
     n0=1.
     mref = 2.        # mass of ion in proton mass
-    
-    rhot0, rhop0, te0, ti0, ne0, ni0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name)
+
+    if profile_type=="ITERDB":
+        rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+    elif profile_type=="pfile":
+        rhot0, rhop0, te0, ti0, ne0, ni0, nz0, vrot0 = read_profile_file(profile_type,profile_name,geomfile_name,suffix)
+
+
     if geomfile_type=="gfile": 
-        xgrid, q = read_geom_file(geomfile_type,geomfile_name,suffix)
-    elif geomfile_type=="GENE_tracor":
-        xgrid, q, Lref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
+        xgrid, q, R_ref= read_geom_file(geomfile_type,geomfile_name,suffix)
+    elif geomfile_type=="GENE_tracer":
+        xgrid, q, Lref, R_ref, Bref, x0_from_para = read_geom_file(geomfile_type,geomfile_name,suffix)
 
     q=q*q_scale
 
-    if geomfile_type=="GENE_tracor":
+    if geomfile_type=="GENE_tracer" and profile_type!="profile":
         rhot0_range_min=np.argmin(abs(rhot0-xgrid[0]))
         rhot0_range_max=np.argmin(abs(rhot0-xgrid[-1]))
         rhot0=rhot0[rhot0_range_min:rhot0_range_max]
@@ -168,33 +383,33 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
         ti0=ti0[rhot0_range_min:rhot0_range_max]
         ne0=ne0[rhot0_range_min:rhot0_range_max]
         ni0=ni0[rhot0_range_min:rhot0_range_max]
+        nz0=nz0[rhot0_range_min:rhot0_range_max]
         vrot0=vrot0[rhot0_range_min:rhot0_range_max]
 
-    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10.)
+    uni_rhot = np.linspace(min(rhot0),max(rhot0),len(rhot0)*10)
 
     te_u = interp(rhot0,te0,uni_rhot)
-    ti_u = interp(rhot0,ti0,uni_rhot)
     ne_u = interp(rhot0,ne0,uni_rhot)
     ni_u = interp(rhot0,ni0,uni_rhot)
+    print(str((len(rhot0),len(nz0),len(uni_rhot))))
+    nz_u = interp(rhot0,nz0,uni_rhot)
     vrot_u = interp(rhot0,vrot0,uni_rhot)
     q      = interp(xgrid,q,uni_rhot)
     tprime_e = -fd_d1_o4(te_u,uni_rhot)/te_u
     nprime_e = -fd_d1_o4(ne_u,uni_rhot)/ne_u
-    tprime_i = -fd_d1_o4(ti_u,uni_rhot)/te_u
-    nprime_i = -fd_d1_o4(ni_u,uni_rhot)/ne_u
     qprime = fd_d1_o4(q,uni_rhot)/q
 
 
     #center_index = np.argmax((tprime_e*te_u+nprime_e*ne_u)[0:int(len(tprime_e)*0.99)])
     
-    if manual_ped==1: 
-        x0_center=mid_ped0
-    else:
+    if int(manual_ped)==-1: 
         if geomfile_type=="gfile": 
             midped, topped=find_pedestal(file_name=geomfile_name, path_name='', plot=False)
-        elif geomfile_type=="GENE_tracor":
+        elif geomfile_type=="GENE_tracer":
             midped=x0_from_para
         x0_center = midped
+    else:
+        x0_center=manual_ped
 
 
     print('mid pedestal is at r/a = '+str(x0_center))
@@ -210,18 +425,16 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
     te_u = te_u[index_begin:len(uni_rhot)-1]
     ne_u = ne_u[index_begin:len(uni_rhot)-1]
     ni_u = ni_u[index_begin:len(uni_rhot)-1]
+    nz_u = nz_u[index_begin:len(uni_rhot)-1]
     vrot_u = vrot_u[index_begin:len(uni_rhot)-1]
     q      = q[index_begin:len(uni_rhot)-1]
     tprime_e = tprime_e[index_begin:len(uni_rhot)-1]
     nprime_e = nprime_e[index_begin:len(uni_rhot)-1]
-    tprime_i = tprime_i[index_begin:len(uni_rhot)-1]
-    nprime_i = nprime_i[index_begin:len(uni_rhot)-1]
     qprime   = qprime[index_begin:len(uni_rhot)-1]
     uni_rhot = uni_rhot[index_begin:len(uni_rhot)-1]
 
     Lt=1./tprime_e
     Ln=1./nprime_e
-    Lq=1./qprime
     
     center_index = np.argmin(abs(uni_rhot-x0_center))
 
@@ -229,6 +442,7 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
 
     ne=ne_u/(10.**19.)      # in 10^19 /m^3
     ni=ni_u/(10.**19.)      # in 10^19 /m^3
+    nz=nz_u/(10.**19.)      # in 10^19 /m^3
     te=te_u/1000.          #in keV
     m_SI = mref *1.6726*10**(-27)
     me_SI = 9.11*10**(-31)
@@ -236,7 +450,7 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
     qref = 1.6*10**(-19)
     #refes to GENE manual
     coll_c=2.3031*10**(-5)*Lref*ne/(te)**2*(24-np.log(np.sqrt(ne*10**13)/(te*1000)))
-    coll_ei=4*(ni/ne)*coll_c*np.sqrt(te*1000.*qref/me_SI)/Lref
+    coll_ei=4.*coll_c*np.sqrt(te*1000.*qref/me_SI)/Lref
     nuei=coll_ei
     beta=403.*10**(-5)*ne*te/Bref**2.
 
@@ -247,6 +461,7 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
     cref = np.sqrt(Tref / m_SI)
     Omegaref = qref * Bref / m_SI / c
     rhoref = cref / Omegaref 
+    rhoref_temp = rhoref * np.sqrt(te_u/te_mid) 
     kymin=n0*q0*rhoref/(Lref*x0_center)
     kyGENE =kymin * (q/q0) * np.sqrt(te_u/te_mid) * (x0_center/uni_rhot) #Add the effect of the q varying
     #from mtm_doppler
@@ -256,26 +471,58 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
     omegaDoppler = abs(vrot_u*n0/(2.*np.pi*1000.))
     omega=mtmFreq + omegaDoppler
 
+    
+
+    if int(manual_zeff)==-1:
+        zeff = ( (ni+Z**2*nz)/ne )[center_index]
+    else:
+        zeff=zeff_manual
+
+    print('********zeff*********')
+    print('zeff='+str(zeff))
+    print('********zeff*********')
+
     omega_n_GENE=kyGENE*(nprime_e)       #in cs/a
+    print("*******************")
+    print("*******************")
+    print(np.max(omega_n_GENE))
+    print("*******************")
+    print("*******************")
     omega_n=omega_n_GENE*gyroFreq/(2.*np.pi*1000.)  #in kHz
 
-    omni_GENE=kyGENE*(nprime_i)       #in cs/a
-    omti_GENE=kyGENE*(tprime_i)       #in cs/a
-    omne_GENE=kyGENE*(nprime_e)       #in cs/a
-    omte_GENE=kyGENE*(tprime_e)       #in cs/a
+    #coll_ei=coll_ei/(1000.)  #in kHz
+    coll_ei=coll_ei/(2.*np.pi*1000.)  #in kHz
 
-    coll_ei=coll_ei/(1000.)  #in kHz
+    Lq=1./(Lref/(R_ref*q)*qprime)
+
 
     shat=Ln/Lq
     eta=Ln/Lt
-    ky=kyGENE
-    nu=(coll_ei)/(omega_n) 
+    ky=kyGENE*np.sqrt(2.)
+    nu=(coll_ei)/(np.max(omega_n))
 
 
-    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref,Lref,plot)
 
+    nuei=nu*omega_n_GENE/omega_n
+
+    
 
     if plot==True:
+        plt.clf()
+        #plt.title('mode number finder')
+        plt.xlabel('r/a')
+        plt.ylabel('omega*, kHz') 
+        plt.plot(uni_rhot,mtmFreq,label='omega*p')
+        plt.plot(uni_rhot,omega_n,label='omega*n')
+        plt.axvline(uni_rhot[np.argmax(mtmFreq)],color='red',alpha=1.,label='peak of omega*p')
+        plt.axvline(uni_rhot[np.argmax(omega_n)],color='green',alpha=1.,label='peak of omega*n')
+        plt.plot(uni_rhot,rhoref_temp,color='purple',label='rhoref')
+        plt.legend()
+        plt.show()
+
+        print("rho i for peak of omega*p: "+str(rhoref_temp[np.argmax(mtmFreq)]))
+        print("rho i for peak of omega*n: "+str(rhoref_temp[np.argmax(omega_n)]))
+
         plt.clf()
         plt.xlabel('r/a')
         plt.ylabel('eta') 
@@ -314,7 +561,12 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
         plt.plot(uni_rhot,ky,label='ky')
         plt.show()
 
+    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
     
+    if abs(mean_rho) + abs(xstar)<0.0001:
+        print('abs(mean_rho) + abs(xstar)<0.0001')
+        quit() 
+
     if output_csv==True:
         with open('profile_output.csv','w') as csvfile:
             data = csv.writer(csvfile, delimiter=',')
@@ -323,7 +575,7 @@ def Parameter_reader(profile_type,profile_name,geomfile_type,geomfile_name,q_sca
                 data.writerow([uni_rhot[i],coll_ei[i],omega_n[i],mtmFreq[i],omegaDoppler[i],nu[i],eta[i],shat[i],beta[i],ky[i]])
         csvfile.close()
     
-    return uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omni_GENE,omti_GENE,omne_GENE,omte_GENE,omega_n_GENE,xstar,Lref,rhoref
+    return uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omega_n_GENE,xstar,Lref, R_ref, rhoref
 
 #scan the Dispersion for the given location(default to be pedestal)
 def Dispersion_list(uni_rhot,nu,eta,shat,beta,ky,ModIndex,mu,xstar,plot):

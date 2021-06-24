@@ -43,7 +43,7 @@ def input():
     return profile_type, geomfile_type, profile_name, geomfile_name, suffix
     
 
-def read_profile_file(profile_type,profile_name,geomfile_name,suffix):
+def read_profile_file(profile_type,profile_name,geomfile_name,suffix='.dat'):
     if profile_type=="ITERDB":
         rhot0, te0, ti0, ne0, ni0, nz0, vrot0 = read_iterdb_file(profile_name)
         psi0 = np.linspace(0.,1.,len(rhot0))
