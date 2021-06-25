@@ -16,8 +16,7 @@ from scipy import optimize
 #For GUI
 import tkinter as tk
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk)
 
 from max_pedestal_finder import find_pedestal
 from max_pedestal_finder import find_pedestal_from_data
@@ -126,7 +125,7 @@ def gaussian_fit(x,data):
 
     return amplitude,mean,stddev
 
-def gaussian_fit_GUI(x,data):
+def gaussian_fit_GUI(root,x,data):
     x,data=np.array(x), np.array(data)
 
     global amplitude
@@ -134,17 +133,19 @@ def gaussian_fit_GUI(x,data):
     global stddev
 
 
-    root=tk.Toplevel()
-    root.title('Gaussian Fit')
+    top=tk.Toplevel(root)
+    top.title('Gaussian Fit')
     #root.geometry("500x500")
     
     #load the icon for the GUI 
-    root.iconbitmap('./Physics_helper_logo.ico')
+    top.iconbitmap('./Physics_helper_logo.ico')
 
     #warnings.simplefilter("error", OptimizeWarning)
-    judge=0
 
-    frame_plot=tk.LabelFrame(root, text='Plot of the data and fitting',padx=20,pady=20)
+    #top=tk.LabelFrame(root, text='Gaussian Fit',padx=20,pady=20)
+    #top.grid(row=0,column=1)
+
+    frame_plot=tk.LabelFrame(top, text='Plot of the data and fitting',padx=20,pady=20)
     frame_plot.grid(row=0,column=0)
     fig = Figure(figsize = (5, 5),
                 dpi = 100)
@@ -176,7 +177,7 @@ def gaussian_fit_GUI(x,data):
     toolbar.update()
     canvas.get_tk_widget().pack()
 
-    root1=tk.LabelFrame(root, text='User Box',padx=20,pady=20)
+    root1=tk.LabelFrame(top, text='User Box',padx=20,pady=20)
     root1.grid(row=0,column=1)
 
 
@@ -187,18 +188,21 @@ def gaussian_fit_GUI(x,data):
 
     option_button11=tk.Radiobutton(frame1, text='Accept the fit',\
                                 variable=opt_var1, value=1,\
-                                command=lambda: click_button(opt_var1.get(), root,root1))
+                                command=lambda: click_button(opt_var1.get(), top,root1))
     option_button11.grid(row=1,column=0)
 
     option_button12=tk.Radiobutton(frame1, text='Enter manually',\
                                 variable=opt_var1, value=2,\
-                                command=lambda: click_button(opt_var1.get(), root,root1))
+                                command=lambda: click_button(opt_var1.get(), top,root1))
     option_button12.grid(row=2,column=0)
         
 
     
+    def save_exit(amplitude,mean,stddev):
+        looping=0
+        top.quit()
 
-    def click_button(value, root, root1):
+    def click_button(value, top, root1):
 
         global amplitude
         global mean
@@ -227,10 +231,10 @@ def gaussian_fit_GUI(x,data):
         label_list.append(mean_label)
         label_list.append(std_label)
 
-        def plot_manual_fit(x,data,mean_Input,sigma_Input,root,label_list):
+        def plot_manual_fit(x,data,mean_Input,sigma_Input,top,label_list):
             #frame_plot.grid_forget()
 
-            frame_plot=tk.LabelFrame(root, text='Plot of the data and fitting',padx=20,pady=20)
+            frame_plot=tk.LabelFrame(top, text='Plot of the data and fitting',padx=20,pady=20)
             frame_plot.grid(row=0,column=0)
             fig = Figure(figsize = (5, 5),
                         dpi = 100)
@@ -284,9 +288,12 @@ def gaussian_fit_GUI(x,data):
             toolbar.update()
             canvas.get_tk_widget().pack()
 
+        
+
         if value==1:
             #'Accept the fit'
-            myButton2=tk.Button(root1, text='Save and Continue', command=lambda :root.destroy())
+            myButton2=tk.Button(root1, text='Save and Continue', \
+                command=lambda : save_exit(amplitude,mean,stddev))
             myButton2.grid(row=3,column=0)
 
         elif value==2:
@@ -310,7 +317,7 @@ def gaussian_fit_GUI(x,data):
                 command=lambda: plot_manual_fit(x,data,\
                     float( mean_Input_box.get()  ),\
                     float( sigma_Input_box.get() ),\
-                    root,label_list\
+                    top,label_list\
                     )  \
                 )
             Plot_Button.grid(row=2,column=1)
@@ -319,18 +326,18 @@ def gaussian_fit_GUI(x,data):
                      state=tk.DISABLED)#state: tk.DISABLED, or tk.NORMAL
             Save_Button.grid(row=3,column=0)
 
-    #creat the GUI
-    root.mainloop()
-
     stddev=abs(stddev)
+    print(f'amplitude,mean,stddev={amplitude},{mean},{stddev}')
+    top.mainloop()
 
+    
     return amplitude,mean,stddev
 
 
 
-def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
-    amplitude,mean,stddev=gaussian_fit_GUI(x,data)
-
+def omega_gaussian_fit(root,x,data,rhoref,Lref,show=False):
+    amplitude,mean,stddev=gaussian_fit_GUI(root,x,data)
+    print(f'amplitude,mean,stddev={amplitude},{mean},{stddev}')
     mean_rho=mean*Lref/rhoref         #normalized to rhoi
     xstar=abs(stddev*Lref/rhoref)
     
@@ -355,9 +362,9 @@ def omega_gaussian_fit(x,data,rhoref,Lref,show=False):
 
 #return nu,ky for the case n_tor=1 for the given location(default to be pedestal)
 def Parameter_reader(profile_type,profile_name,\
-                geomfile_type,geomfile_name,\
-                q_scale,manual_ped,manual_zeff,suffix,Z=6.,\
-                plot=False,output_csv=True):
+    geomfile_type,geomfile_name,Run_mode,\
+    q_scale,manual_ped,manual_zeff,suffix,root,Z=6.,\
+    plot=False,output_csv=True):
     n0=1.
     mref = 2.        # mass of ion in proton mass
 
@@ -476,18 +483,11 @@ def Parameter_reader(profile_type,profile_name,\
     if int(manual_zeff)==-1:
         zeff = ( (ni+Z**2*nz)/ne )[center_index]
     else:
-        zeff=zeff_manual
+        zeff=manual_zeff
 
-    print('********zeff*********')
     print('zeff='+str(zeff))
-    print('********zeff*********')
 
     omega_n_GENE=kyGENE*(nprime_e)       #in cs/a
-    print("*******************")
-    print("*******************")
-    print(np.max(omega_n_GENE))
-    print("*******************")
-    print("*******************")
     omega_n=omega_n_GENE*gyroFreq/(2.*np.pi*1000.)  #in kHz
 
     #coll_ei=coll_ei/(1000.)  #in kHz
@@ -561,11 +561,14 @@ def Parameter_reader(profile_type,profile_name,\
         plt.plot(uni_rhot,ky,label='ky')
         plt.show()
 
-    mean_rho,xstar=omega_gaussian_fit(uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
+    if Run_mode==2 :              #calculate global disparsion
+        mean_rho,xstar=omega_gaussian_fit(root,uni_rhot,mtmFreq,rhoref*np.sqrt(2.),Lref,plot)
+    else :
+        mean_rho,xstar=0,0
     
-    if abs(mean_rho) + abs(xstar)<0.0001:
-        print('abs(mean_rho) + abs(xstar)<0.0001')
-        quit() 
+    #if abs(mean_rho) + abs(xstar)<0.0001:
+    #    print('abs(mean_rho) + abs(xstar)<0.0001')
+    #    pass() 
 
     if output_csv==True:
         with open('profile_output.csv','w') as csvfile:
@@ -575,7 +578,8 @@ def Parameter_reader(profile_type,profile_name,\
                 data.writerow([uni_rhot[i],coll_ei[i],omega_n[i],mtmFreq[i],omegaDoppler[i],nu[i],eta[i],shat[i],beta[i],ky[i]])
         csvfile.close()
     
-    return uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omega_n_GENE,xstar,Lref, R_ref, rhoref
+    return uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,\
+            omega_n_GENE,xstar,Lref, R_ref, rhoref, zeff
 
 #scan the Dispersion for the given location(default to be pedestal)
 def Dispersion_list(uni_rhot,nu,eta,shat,beta,ky,ModIndex,mu,xstar,plot):
@@ -644,10 +648,9 @@ def Peak_of_drive(uni_rhot,mtmFreq,omegaDoppler,omega_percent):
     x_peak_range=[]
     x_range_ind=[]
     #omega=mtmFreq+omegaDoppler
-    if peak_of_plasma_frame==True:
-        omega=mtmFreq
-    else:
-        omega=mtmFreq+omegaDoppler
+    
+    omega=mtmFreq
+    
     #if manual_ped==1:
     #    mid_ped0
     #mid_ped0=0.958
@@ -663,7 +666,9 @@ def Peak_of_drive(uni_rhot,mtmFreq,omegaDoppler,omega_percent):
     return x_peak_range, x_range_ind
 
 #scan toroidial mode number
-def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFreq,omegaDoppler,x_peak_range,x_range_ind,n_min,n_max,rhoi,Lref,ModIndex,xstar,plot,output_csv):
+def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,\
+    omega_n_GENE,mtmFreq,omegaDoppler,x_peak_range,x_range_ind,\
+    n_min,n_max,rhoi,Lref,Run_mode,xstar,Zeff,plot,output_csv):
     ind_min  =min(x_range_ind)
     ind_max  =max(x_range_ind)
     uni_rhot_full=uni_rhot
@@ -734,8 +739,7 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
         #gamma,omega,factor=Dispersion_list(uni_rhot_full,nu_full/float(n0),eta_full,shat_full,beta_full,ky_full*float(n0),ModIndex,mu,xstar,plot=False)
         x0_list, m0_list=Rational_surface(uni_rhot_top,q_top,n0)
         #print(x_list)
-        if plot==True and max(gamma)>0:
-            plt.plot(uni_rhot,gamma)   #,label='n='+str(n0))
+        
 
         for i in range(len(x0_list)):
             x=x0_list[i]
@@ -748,12 +752,26 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             
             mu=(x-x_peak)*Lref/rhoi
 
-            gamma=Dispersion(nu_top[x_index]/float(n0),eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar)
-            #gamma,factor=Dispersion(nu_top[x_index]/float(n0),eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar,)
-            
-            gamma_complex=gamma
-            gamma=gamma_complex.imag
-            omega=gamma_complex.real
+            if Run_mode==1:
+                gamma=1.
+                omega=0.
+            elif Run_mode==2:#Global 
+                ModIndex=1
+                gamma=Dispersion(nu_top[x_index]/float(n0),Zeff,eta_top[x_index],\
+                    shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar)
+                gamma_complex=gamma
+                gamma=gamma_complex.imag
+                omega=gamma_complex.real
+            elif Run_mode==3:#Global
+                ModIndex=0
+                gamma=Dispersion(nu_top[x_index]/float(n0),Zeff,eta_top[x_index],\
+                    shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar)
+                gamma_complex=gamma
+                gamma=gamma_complex.imag
+                omega=gamma_complex.real
+
+            if plot==True and gamma>0:
+                plt.plot(x,gamma)   #,label='n='+str(n0))
 
             
             kHz_to_cs_a=omega_n_GENE_top[x_index]/omega_n_top[x_index]   # kHz * (kHz_to_cs_a)= cs/a unit
@@ -794,12 +812,16 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
 
             #print("x="+str(x)+", gamma(kHz)="+str(gamma_kHz))
             if plot==True and gamma>0:
-                plt.axvline(x,color='red',alpha=0.05)
+                plt.axvline(x,color='red',alpha=0.5)
 
     if plot==True:
+        plt.axvline(-100,color='red',alpha=1,label='unstable MTM')
         plt.axvline(min(uni_rhot_top),color='green',label="near the peak of omega*")
         plt.axvline(max(uni_rhot_top),color='green',label="near the peak of omega*")
-        plt.axhline(0,color='red',label="gamma=0")
+        plt.xlim(min(uni_rhot_top),max(uni_rhot_top))
+        plt.plot(uni_rhot_top,mtmFreq_top,label='omega*',color='blue')
+        plt.plot(uni_rhot_top,q_top,label='safety factor',color='purple')
+        plt.grid()
         plt.legend()
         plt.show()
     
@@ -947,7 +969,7 @@ def peak_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFreq,omegaD
 
 def MTM_scan(profile_name,geomfile_name,q_scale,omega_percent,bins,n_min,n_max,plot_profile,plot_n_scan,csv_profile,csv_n_scan): 
     #return nu,ky for the case n_tor=1 for the given location(default to be pedestal)
-    uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omega_n_GENE,xstar,Lref,rhoi=Parameter_reader(profile_name,geomfile_name,q_scale,manual_ped,mid_ped0,plot=plot_profile,output_csv=csv_profile)
+    uni_rhot,nu,eta,shat,beta,ky,q,mtmFreq,omegaDoppler,omega_n,omega_n_GENE,xstar,Lref,rhoref=Parameter_reader(profile_name,geomfile_name,q_scale,manual_ped,mid_ped0,plot=plot_profile,output_csv=csv_profile)
     print(mtmFreq)
     print(omegaDoppler)
     x_peak_range, x_range_ind=Peak_of_drive(uni_rhot,mtmFreq,omegaDoppler,omega_percent)
@@ -959,7 +981,7 @@ def MTM_scan(profile_name,geomfile_name,q_scale,omega_percent,bins,n_min,n_max,p
     omega_star_list_kHz,omega_star_list_Lab_kHz\
     =Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,\
     omega_n,omega_n_GENE,mtmFreq,omegaDoppler,x_peak_range,x_range_ind,\
-    n_min,n_max,rhoi,Lref,ModIndex,xstar,plot=plot_n_scan,output_csv=csv_n_scan)
+    n_min,n_max,rhoref,Lref,ModIndex,xstar,plot=plot_n_scan,output_csv=csv_n_scan)
 
     '''
     x_list,n_list,m_list,gamma_list,\
