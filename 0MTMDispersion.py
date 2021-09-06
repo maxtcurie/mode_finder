@@ -43,15 +43,15 @@ profile_type="pfile"          # "ITERDB" "pfile", "profile_e", "profile_both"
 geomfile_type="gfile"         # "gfile"  "GENE_tracer"
 
 #path='/global/u1/m/maxcurie/max/Cases/DIIID162940_Ehab/'
-path='/global/u1/m/maxcurie/max/Cases/jet78697/'
+path='../3770ms/V1/'
 #path=''
-profile_name = 'p175823.04100_f7099' 
+profile_name = path+'p174819.04770_norm' 
 #profile_name = path+'DIIID162940.iterdb'
 #profile_name =path+'jet78697.51005_hager_Z6.0Zeff2.35__negom_alpha1.2_TiTe.iterdb'		#name of the profile file
                                             #DIIID175823.iterdb
                                             #p000000
 #geomfile_name = 'g175823.04108_257x257'
-geomfile_name = 'g175823.04108_257x257'
+geomfile_name = path+'g174819.04770_norm'
 #geomfile_name = 'tracer_efit.dat'
 
 #geomfile_name = 'gene_0001_qmult0.958_hager_78697_nx0320_nz060'     #name of the magnetic geometry file
@@ -61,15 +61,16 @@ geomfile_name = 'g175823.04108_257x257'
 suffix='dat'            	    #The suffix if one choose to use GENE_tracer for q profile
                                 #0001, 1, dat
 
-run_mode_finder=True        #Change to True if one want to run mode finder 
-run_nu_scan=False           #Change to True if one want to run collisionality scan 
+run_mode_finder=True        #Change to True if one wants to run mode finder 
+run_nu_scan=False           #Change to True if one wants to run collisionality scan 
+Dispersion_calc=False       #Change to True if one wants to calculate the growth rate from dispersion
 ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
 
-omega_percent=10.                      #choose the omega within the top that percent defined in(0,100)
+omega_percent=40.                      #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
-n_min=10                                #minmum mode number (include) that finder will cover
-n_max=30                              #maximum mode number (include) that finder will cover
+n_min=2                                #minmum mode number (include) that finder will cover
+n_max=4                              #maximum mode number (include) that finder will cover
 bins=800                               #sizes of bins to smooth the function
 plot_profile=False                     #Set to True is user want to have the plot of the profile
 plot_n_scan=False                      #Set to True is user want to have the plot of the gamma over n
@@ -510,7 +511,10 @@ def Dispersion_list(uni_rhot,nu,eta,shat,beta,ky,ModIndex,mu,xstar,plot):
     #factor=[]
 
     for i in range(nx):
-        gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
+        if Dispersion_calc==True: 
+            gamma_complex_temp=Dispersion(nu[i],zeff,eta[i],shat[i],beta[i],ky[i],ModIndex,mu[i],xstar) 
+        else:
+            gamma_complex_temp=(1.+eta[i])+0j
         gamma_complex.append(gamma_complex_temp)
         #factor.append(factor_temp)
 
@@ -677,7 +681,10 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             
             mu=(x-x_peak)*Lref/rhoi
             factor_temp=np.sqrt((float(m)/Lref)**2.+(float(n0)/R_ref)**2.)*Lref/q_top[x_index]
-            gamma=Dispersion(nu_top[x_index]/factor_temp,zeff,eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*factor_temp,ModIndex,mu,xstar)
+            if Dispersion_calc==True:
+                gamma=Dispersion(nu_top[x_index]/factor_temp,zeff,eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*factor_temp,ModIndex,mu,xstar)
+            else:
+                gamma=(1.+eta_top[x_index])+0j
             #gamma,factor=Dispersion(nu_top[x_index]/float(n0),eta_top[x_index],shat_top[x_index],beta_top[x_index],ky_top[x_index]*float(n0),ModIndex,mu,xstar,)
             
             gamma_complex=gamma
