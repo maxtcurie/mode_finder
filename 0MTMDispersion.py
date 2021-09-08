@@ -66,7 +66,7 @@ run_nu_scan=False           #Change to True if one wants to run collisionality s
 Dispersion_calc=False       #Change to True if one wants to calculate the growth rate from dispersion
 ModIndex=1 					# 1 is taking global effect, 0 is only local effect 
 
-omega_percent=40.                      #choose the omega within the top that percent defined in(0,100)
+omega_percent=10.                      #choose the omega within the top that percent defined in(0,100)
 #q_scale=1.015
 q_scale=1. #0.949 #0.955
 n_min=2                                #minmum mode number (include) that finder will cover
@@ -81,8 +81,8 @@ peak_of_plasma_frame=False             #Set to True if one want to look around t
 
 zeff_manual=False  #2.35	#Effective charges due impurity
 Z=6.		#charge of impurity
-manual_ped=0
-mid_ped0=0.97
+manual_ped=1
+mid_ped0=0.965
 
 
 #******For scaning********
@@ -333,7 +333,8 @@ def Parameter_reader(profile_name,geomfile,q_scale,manual_ped,mid_ped0,plot,outp
     Lt=1./tprime_e
     Ln=1./nprime_e
     
-    
+    #print(uni_rhot)
+
     center_index = np.argmin(abs(uni_rhot-x0_center))
 
     q0      = q[center_index]
@@ -654,7 +655,7 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
         
         
     if output_csv==True:
-        with open('MTM_dispersion_n_scan'+profile_name+'.csv','w') as csvfile:
+        with open('MTM_dispersion_n_scan.csv','w') as csvfile:
             data = csv.writer(csvfile, delimiter=',')
             data.writerow([   'x/a',     'n',      'm',      'gamma(kHz)',      'gamma(cs/a)',    'nu_ei(kHz)','omega*/omega*_max' ,'omega_plasma(kHz)','omega_lab(kHz)',   'omega_star_plasma(kHz)','omega_star_lab(kHz)','nu', 'eta', 'shat', 'beta', 'ky', 'mu', 'xstar'])
             csvfile.close()
@@ -726,7 +727,7 @@ def Dispersion_n_scan(uni_rhot,nu,eta,shat,beta,ky,q,omega_n,omega_n_GENE,mtmFre
             xstar_list.append(xstar)
 
             if output_csv==True:
-                with open('MTM_dispersion_n_scan'+profile_name+'.csv','a+') as csvfile:
+                with open('MTM_dispersion_n_scan.csv','a+') as csvfile:
                     data = csv.writer(csvfile, delimiter=',')
                     data.writerow([x_list[-1],n_list[-1],m_list[-1],gamma_list_kHz[-1],gamma_list_kHz[-1]*kHz_to_cs_a_list[-1],nu_ei_kHz_list[-1],omega_omega_peak_list[-1],omega_list_kHz[-1],omega_list_Lab_kHz[-1],omega_star_list_kHz[-1],omega_star_list_Lab_kHz[-1],nu_list[-1], eta_list[-1], shat_list[-1], beta_list[-1], ky_list[-1], mu_list[-1], xstar_list[-1]])
                     csvfile.close()
